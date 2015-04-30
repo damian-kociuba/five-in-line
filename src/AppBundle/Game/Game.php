@@ -19,5 +19,9 @@ class Game {
      */
     private $nextMovingPlayer;
     
+    public function addPlayer(Player $player) {
+        $this->players[] = $player;
+    }
+    
     
 }
