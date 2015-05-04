@@ -2,6 +2,8 @@
 
 namespace AppBundle\Game;
 
+use AppBundle\Storage\ObjectStorage;
+
 /**
  * Description of GameSystem
  *
@@ -22,7 +24,7 @@ class GameSystem {
     }
 
     /**
-     * @var \SplObjectStorage
+     * @var ObjectSorage
      */
     private $gamesRepository;
 
@@ -30,12 +32,15 @@ class GameSystem {
         $this->gamesRepository = new \SplObjectStorage();
     }
 
+    /**
+     * 
+     * @return ObjectStorage
+     */
     public function getGamesRepository() {
         return $this->gamesRepository;
     }
 
     /**
-     * 
      * @param Player $playerCreator
      * @return PrivateGame
      */

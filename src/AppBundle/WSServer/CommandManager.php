@@ -24,12 +24,11 @@ class CommandManager implements MessageComponentInterface {
      * @var WSCommandInterface[] 
      */
     private $registeredCommands = array();
-    
+
     /**
      * @var \SplObjectStorage
      */
     private $connections;
-    
 
     public function __construct(EntityManagerInterface $em, array $registeredCommandClassNames) {
         $this->connections = new \SplObjectStorage();
@@ -54,38 +53,27 @@ class CommandManager implements MessageComponentInterface {
      */
     public function onMessage(ConnectionInterface $connection, $msg) {
         echo "Message: \n" . $msg;
-        
-        $decodedMessage = json_decode($msg, true);
-        $this->validateMessage($decodedMessage);
-        $command = $this->getCommandByMessage($decodedMessage);
-        $command->validateParameters($decodedMessage['parameters']);
-        $result = $command->run($decodedMessage);
+        $message = new Message();
+        $message->setConnection($connection);
+        $message->readFromJSON($msg);
+        $command = $this->getCommandByMessage($message);
+        $command->validateParameters($message->getParameters());
+        $result = $command->run($message);
         if ($result !== null) {
             $this->sendResponse($connection, $result);
         }
     }
 
-    /**
-     * @param type $message
-     * @throws \Exception
-     */
-    private function validateMessage($message) {
-        if (!is_array($message)) {
-            throw new \Exception('Message should be array given ' . gettype($message));
-        }
-        if (empty($message['command'])) {
-            throw new \Exception('Message array should have "command" field');
-        }
-    }
+    
 
     /**
      * @param array $message
      * @return WSCommandInterface
      * @throws \Exception
      */
-    private function getCommandByMessage(array $message) {
+    private function getCommandByMessage(Message $message) {
         foreach ($this->registeredCommands as $command) {
-            if ($command->getCommandName() === $message['command']) {
+            if ($command->getCommandName() === $message->getCommandName()) {
                 return $command;
             }
         }
@@ -96,8 +84,8 @@ class CommandManager implements MessageComponentInterface {
         if (!($response instanceof Response\ResponseInterface)) {
             throw new \Exception('Response which is returned by command should implements ResponseInterface');
         }
-        
-        $dataToSend = array('command' => $response->getName(), 'data'=>$response->getData());
+
+        $dataToSend = array('command' => $response->getName(), 'data' => $response->getData());
         $connection->send(json_encode($dataToSend));
     }
 
