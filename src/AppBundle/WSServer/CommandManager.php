@@ -30,15 +30,14 @@ class CommandManager implements MessageComponentInterface {
      */
     private $connections;
 
-    public function __construct(EntityManagerInterface $em, array $registeredCommandClassNames) {
+    public function __construct(EntityManagerInterface $em, array $registeredCommandClasses) {
         $this->connections = new \SplObjectStorage();
         $this->em = $em;
-        foreach ($registeredCommandClassNames as $className) {
-            $this->registeredCommands[] = new $className;
-        }
+        $this->registeredCommands = $registeredCommandClasses;
     }
 
     public function onOpen(ConnectionInterface $conn) {
+        echo 'Connectio open';
         $this->connections->attach($conn);
     }
 
@@ -77,7 +76,7 @@ class CommandManager implements MessageComponentInterface {
                 return $command;
             }
         }
-        throw new \Exception('Command "' . $message['type'] . '" not found');
+        throw new \Exception('Command "' . $message->getCommandName() . '" not found');
     }
 
     private function sendResponse(ConnectionInterface $connection, $response) {

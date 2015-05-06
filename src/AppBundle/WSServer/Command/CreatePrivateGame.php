@@ -5,24 +5,33 @@ namespace AppBundle\WSServer\Command;
 use AppBundle\Game\GameSystem;
 use AppBundle\WSServer\Response\PrivateGameCreated;
 use AppBundle\WSServer\Message;
+
 /**
  * @author dkociuba
  */
 class CreatePrivateGame implements WSCommandInterface {
 
+    /**
+     *
+     * @var GameSystem
+     */
+    private $gameSystem;
+
+    public function __construct(GameSystem $gameSystem) {
+        $this->gameSystem = $gameSystem;
+    }
+
     public function run(Message $message) {
         $parameters = $message->getParameters();
         echo 'Create Private Game';
-        $gameSystem = GameSystem::getInstance();
-        $player = $gameSystem->createPlayer($parameters['playerName']);
+        $player = $this->gameSystem->createPlayer($parameters['playerName']);
         $player->setConnection($message->getConnection());
-        $game = $gameSystem->createPrivateGame($player);
-        $gameSystem->getGamesRepository()->attach($game);
-        
+        $game = $this->gameSystem->createPrivateGame($player);
+        $this->gameSystem->getGamesRepository()->attach($game);
+
         $response = new PrivateGameCreated();
         $response->setGameHashId($game->getHashId());
         return $response;
-        
     }
 
     public function getCommandName() {

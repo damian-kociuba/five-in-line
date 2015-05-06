@@ -11,25 +11,14 @@ use AppBundle\Storage\ObjectStorage;
  */
 class GameSystem {
 
-    private static $instance = null;
-
-    /**
-     * @return GameSystem
-     */
-    public static function getInstance() {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
-
     /**
      * @var ObjectSorage
      */
     private $gamesRepository;
 
     public function __construct() {
-        $this->gamesRepository = new \SplObjectStorage();
+        $this->gamesRepository = new ObjectStorage();
+        echo 'Game system construct';
     }
 
     /**

@@ -4,9 +4,23 @@ parameters:
 #    parameter_name: value
 
 services:
+    game_system:
+        class: AppBundle\Game\GameSystem
+        
+    ws_manager.command.create_private_game:
+        class: AppBundle\WSServer\Command\CreatePrivateGame
+        arguments:
+            - @game_system
+            
+    ws_manager.command.join_to_private_game:
+        class: AppBundle\WSServer\Command\JoinToPrivateGame
+        arguments:
+            - @game_system
+            
     ws_manager:
         class: AppBundle\WSServer\CommandManager
         arguments: 
             - @doctrine.orm.default_entity_manager
             - 
-                - AppBundle\WSServer\Command\CreatePrivateGame
+                - @ws_manager.command.create_private_game
+                - @ws_manager.command.join_to_private_game
