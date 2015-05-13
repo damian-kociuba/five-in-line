@@ -45,6 +45,9 @@ class Game {
      * @return Player
      */
     public function getNextMovingPlayer() {
+        if($this->nextMovingPlayerIndex === null) {
+            throw new \Exception('Next moving player is not defined. Did you forget use setFirstMovePlayer method?');
+        }
         return $this->players[$this->nextMovingPlayerIndex];
     }
 

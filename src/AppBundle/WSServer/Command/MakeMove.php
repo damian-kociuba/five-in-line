@@ -32,6 +32,9 @@ class MakeMove implements WSCommandInterface {
 
     public function run(Message $message) {
         $game = $this->getGameByConnection($this->gameSystem->getGamesRepository(), $message->getConnection());
+        if(!$game) {
+            throw new \Exception('This connection dont have active game');
+        }
         $players = $game->getPlayers();
         if ($players[0]->getConnection() === $message->getConnection()) {
             $player = $players[0];
@@ -48,7 +51,7 @@ class MakeMove implements WSCommandInterface {
         $game->getBoard()->markField($parameters['x'], $parameters['y'], $player->getColor());
         $game->changePlayerTurn();
         
-        $player->getConnection()->send(array(
+        $player->getConnection()->send(json_encode(array(
             'command' => 'MoveMade',
             'parameters' => array(
                 'color' => $player->getColor(),
@@ -56,8 +59,8 @@ class MakeMove implements WSCommandInterface {
                 'y' => $parameters['y'],
                 'isPlayerTurn' => false,
             )
-        ));
-        $opponent->getConnection()->send(array(
+        )));
+        $opponent->getConnection()->send(json_encode(array(
             'command' => 'MoveMade',
             'parameters' => array(
                 'color' => $player->getColor(),
@@ -65,7 +68,7 @@ class MakeMove implements WSCommandInterface {
                 'y' => $parameters['y'],
                 'isPlayerTurn' => true,
             )
-        ));
+        )));
     }
 
     /**
