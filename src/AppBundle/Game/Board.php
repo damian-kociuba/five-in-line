@@ -34,8 +34,20 @@ class Board {
         }
     }
 
+    public function getWidth() {
+        return $this->width;
+    }
+
+    public function getHeight() {
+        return $this->height;
+    }
+
     public function getByXY($x, $y) {
         return $this->fields[$y][$x];
+    }
+
+    public function getAllRawFields() {
+        return $this->fields;
     }
 
     public function markField($x, $y, $fieldColor) {

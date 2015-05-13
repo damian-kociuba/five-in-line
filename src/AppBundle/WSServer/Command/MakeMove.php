@@ -6,6 +6,7 @@ use AppBundle\WSServer\Message;
 use AppBundle\Game\GameSystem;
 use AppBundle\Storage\ObjectStorage;
 use AppBundle\Game\Game;
+use AppBundle\Game\Judge;
 use Ratchet\ConnectionInterface;
 
 /**
@@ -32,7 +33,7 @@ class MakeMove implements WSCommandInterface {
 
     public function run(Message $message) {
         $game = $this->getGameByConnection($this->gameSystem->getGamesRepository(), $message->getConnection());
-        if(!$game) {
+        if (!$game) {
             throw new \Exception('This connection dont have active game');
         }
         $players = $game->getPlayers();
@@ -43,19 +44,19 @@ class MakeMove implements WSCommandInterface {
             $player = $players[1];
             $opponent = $players[0];
         }
-        
-        if($game->getNextMovingPlayer() !== $player) {
+
+        if ($game->getNextMovingPlayer() !== $player) {
             throw new \Exception('It\'s not your turn');
         }
         $parameters = $message->getParameters();
         $game->getBoard()->markField($parameters['x'], $parameters['y'], $player->getColor());
         $game->changePlayerTurn();
-        
+
         $player->getConnection()->send(json_encode(array(
             'command' => 'MoveMade',
             'parameters' => array(
                 'color' => $player->getColor(),
-                'x' => $parameters['x'], 
+                'x' => $parameters['x'],
                 'y' => $parameters['y'],
                 'isPlayerTurn' => false,
             )
@@ -64,11 +65,36 @@ class MakeMove implements WSCommandInterface {
             'command' => 'MoveMade',
             'parameters' => array(
                 'color' => $player->getColor(),
-                'x' => $parameters['x'], 
+                'x' => $parameters['x'],
                 'y' => $parameters['y'],
                 'isPlayerTurn' => true,
             )
         )));
+
+        $judge = new Judge();
+        $gameState = $judge->check($game->getBoard(), $player, $opponent);
+        if ($gameState === Judge::CONTINUE_PLAYING) {
+            return;
+        }
+
+        //command template
+        $finishCommandForWinner = $finishCommandForLoser = $finishCommandWhenDraw = array(
+            'command' => 'FinishGame',
+            'parameters' => array()
+        );
+        $finishCommandForWinner['parameters']['result'] = 'PlayerWin';
+        $finishCommandForLoser['parameters']['result'] = 'OpponentWin';
+        if ($gameState === Judge::FIRST_PLAYER_WIN) {
+            $player->getConnection()->send(json_encode($finishCommandForWinner));
+            $opponent->getConnection()->send(json_encode($finishCommandForLoser));
+        } elseif ($gameState === Judge::SECOND_PLAYER_WIN) {
+            $player->getConnection()->send(json_encode($finishCommandForLoser));
+            $opponent->getConnection()->send(json_encode($finishCommandForWinner));
+        } elseif ($gameState === Judge::DRAW) {
+            $finishCommandWhenDraw['parameters']['result'] = 'Draw';
+            $player->getConnection()->send(json_encode($finishCommandWhenDraw));
+            $opponent->getConnection()->send(json_encode($finishCommandWhenDraw));
+        }
     }
 
     /**
@@ -89,8 +115,9 @@ class MakeMove implements WSCommandInterface {
         }
     }
 
-    public function validateParameters(array $parameters) {
-        if (empty($parameters['x']) || empty($parameters['y'])) {
+    public
+            function validateParameters(array $parameters) {
+        if ($parameters['x']===null || $parameters['y']===null) {
             throw new \Exception('Parameter x and y is required');
         }
     }
