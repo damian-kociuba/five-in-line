@@ -23,7 +23,7 @@ class JoinToPrivateGameTest extends \PHPUnit_Framework_TestCase {
     private $gameSystem;
 
     protected function setUp() {
-        $this->gameSystem = new GameSystem();
+        $this->gameSystem = new GameSystem(array('boardWidth'=>20,'boardHeight'=>20));
         $player = $this->gameSystem->createPlayer('firstPlayer');
         $connection = new \AppBundle\Tests\WSServer\ConnectionMock();
         $player->setConnection($connection);
@@ -83,7 +83,7 @@ class JoinToPrivateGameTest extends \PHPUnit_Framework_TestCase {
         $connectionMock = $firstPlayer->getConnection();
         $sendedData = json_decode($connectionMock->getSendedData(), true);
         
-        $this->assertEquals('SecondPlayerJoinToPrivateGame', $sendedData['command']);
+        $this->assertEquals('StartGame', $sendedData['command']);
     }
 
     private function prepareMessage() {

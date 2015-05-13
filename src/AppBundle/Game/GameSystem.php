@@ -16,7 +16,13 @@ class GameSystem {
      */
     private $gamesRepository;
 
-    public function __construct() {
+    /**
+     * @var array
+     */
+    private $configValues;
+
+    public function __construct($configValues) {
+        $this->configValues = $configValues;
         $this->gamesRepository = new ObjectStorage();
         echo 'Game system construct';
     }
@@ -34,7 +40,8 @@ class GameSystem {
      * @return PrivateGame
      */
     public function createPrivateGame(Player $playerCreator) {
-        $game = new PrivateGame();
+        $game = new PrivateGame($this->configValues['boardWidth'], $this->configValues['boardHeight']);
+        
         $game->addPlayer($playerCreator);
         $game->setHashId(uniqid());
         return $game;

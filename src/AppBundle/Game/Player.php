@@ -11,6 +11,7 @@ class Player {
 
     private $name;
 
+    private $color;
     /**
      * @var ConnectionInterface
      */
@@ -35,4 +36,11 @@ class Player {
         return $this->connection;
     }
 
+    public function getColor() {
+        return $this->color;
+    }
+    
+    public function setColor($color) {
+        $this->color = $color;
+    }
 }

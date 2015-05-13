@@ -45,8 +45,33 @@ class JoinToPrivateGame implements WSCommandInterface {
         $secondPlayer->setConnection($message->getConnection());
         $game->addPlayer($secondPlayer);
 
+        $firstPlayerColor = (rand(0,1) == 1 ? 'black' : 'white'); //randomly black or white
+        $secondPlayerColor = $firstPlayerColor == 'black' ? 'white' : 'black'; //opposed color
+        $isFirstPlayerTurn = rand(0,1) == 1; //randomly true or false
+        $isSecondPlayerTurn = !$isFirstPlayerTurn;
+        
+        $firstPlayer->setColor($firstPlayerColor);
+        $secondPlayer->setColor($secondPlayerColor);
+        if($isFirstPlayerTurn) {
+            $game->setFirstMovePlayer($firstPlayer);
+        } else {
+            $game->setFirstMovePlayer($secondPlayer);
+        }
+        
         $firstPlayer->getConnection()->send(json_encode(array(
-            'command' => 'SecondPlayerJoinToPrivateGame'
+            'command' => 'StartGame',
+            'parameters' => array( 
+                'playerColor' => $firstPlayerColor,
+                'isPlayerTurn' => $isFirstPlayerTurn
+                )
+        )));
+        
+        $secondPlayer->getConnection()->send(json_encode(array(
+            'command' => 'StartGame',
+            'parameters' => array( 
+                'playerColor' => $secondPlayerColor,
+                'isPlayerTurn' => $isSecondPlayerTurn
+                )
         )));
     }
 

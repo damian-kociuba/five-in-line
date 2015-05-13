@@ -6,6 +6,8 @@ parameters:
 services:
     game_system:
         class: AppBundle\Game\GameSystem
+        arguments:
+            - {boardWidth: 20, boardHeight: 20}
         
     ws_manager.command.create_private_game:
         class: AppBundle\WSServer\Command\CreatePrivateGame
@@ -17,6 +19,11 @@ services:
         arguments:
             - @game_system
             
+    ws_manager.command.make_move:
+        class: AppBundle\WSServer\Command\MakeMove
+        arguments:
+            - @game_system
+            
     ws_manager:
         class: AppBundle\WSServer\CommandManager
         arguments: 
@@ -24,3 +31,4 @@ services:
             - 
                 - @ws_manager.command.create_private_game
                 - @ws_manager.command.join_to_private_game
+                - @ws_manager.command.make_move
