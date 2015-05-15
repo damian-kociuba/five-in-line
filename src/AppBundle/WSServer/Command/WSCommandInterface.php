@@ -9,9 +9,14 @@ use AppBundle\WSServer\Message;
  */
 interface WSCommandInterface {
 
+    const ON_MESSAGE_TYPE = 1;
+    const ON_CLOSE_TYPE = 2;
+    
     public function getCommandName();
 
     public function validateParameters(array $parameters);
     
     public function run(Message $message);
+    
+    public function getType();
 }

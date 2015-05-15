@@ -32,6 +32,7 @@ class MakeMove implements WSCommandInterface {
     }
 
     public function run(Message $message) {
+        var_dump($this->gameSystem->getGamesRepository());
         $game = $this->getGameByConnection($this->gameSystem->getGamesRepository(), $message->getConnection());
         if (!$game) {
             throw new \Exception('This connection dont have active game');
@@ -107,19 +108,20 @@ class MakeMove implements WSCommandInterface {
         foreach ($gamesRepository as $game) {
             $players = $game->getPlayers();
             foreach ($players as $onePlayer) {
-                if ($onePlayer->getConnection() == $connection) {
+                if ($onePlayer->getConnection() === $connection) {
                     return $game;
                 }
             }
-            return null;
         }
+        return null;
     }
 
-    public
-            function validateParameters(array $parameters) {
-        if ($parameters['x']===null || $parameters['y']===null) {
+    public function validateParameters(array $parameters) {
+        if ($parameters['x'] === null || $parameters['y'] === null) {
             throw new \Exception('Parameter x and y is required');
         }
     }
-
+    public function getType() {
+        return WSCommandInterface::ON_MESSAGE_TYPE;
+    }
 }

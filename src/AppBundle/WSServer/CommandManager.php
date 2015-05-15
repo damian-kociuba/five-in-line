@@ -41,8 +41,17 @@ class CommandManager implements MessageComponentInterface {
         $this->connections->attach($conn);
     }
 
-    public function onClose(ConnectionInterface $conn) {
-        $this->connections->detach($conn);
+    public function onClose(ConnectionInterface $connection) {
+
+        $message = new Message();
+        $message->setConnection($connection);
+        foreach ($this->registeredCommands as $command) {
+            if ($command->getType() === WSCommandInterface::ON_CLOSE_TYPE) {
+                $command->run($message);
+            }
+        }
+
+        $this->connections->detach($connection);
         echo 'Connection close';
     }
 
@@ -51,19 +60,29 @@ class CommandManager implements MessageComponentInterface {
      * @param string $msg
      */
     public function onMessage(ConnectionInterface $connection, $msg) {
-        echo "Message: \n" . $msg;
+        echo "Message: \n" . $msg . "\n";
         $message = new Message();
         $message->setConnection($connection);
         $message->readFromJSON($msg);
         $command = $this->getCommandByMessage($message);
-        $command->validateParameters($message->getParameters());
-        $result = $command->run($message);
-        if ($result !== null) {
-            $this->sendResponse($connection, $result);
+        try {
+            $command->validateParameters($message->getParameters());
+            $result = $command->run($message);
+            if ($result !== null) {
+                $this->sendResponse($connection, $result);
+            }
+        } catch (\Exception $e) {
+
+            echo 'Error in ' . $e->getFile() . ':' . $e->getLine() . "\n" . $e->getMessage() . "\n";
+            echo $e->getTraceAsString();
+            $connection->send(json_encode(array(
+                'command' => 'Error',
+                'parameters' => array(
+                    'message' => $e->getMessage()
+                )
+            )));
         }
     }
-
-    
 
     /**
      * @param array $message
@@ -72,6 +91,9 @@ class CommandManager implements MessageComponentInterface {
      */
     private function getCommandByMessage(Message $message) {
         foreach ($this->registeredCommands as $command) {
+            if ($command->getType() !== WSCommandInterface::ON_MESSAGE_TYPE) {
+                continue;
+            }
             if ($command->getCommandName() === $message->getCommandName()) {
                 return $command;
             }

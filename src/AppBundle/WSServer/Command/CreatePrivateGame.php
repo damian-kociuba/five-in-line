@@ -48,4 +48,8 @@ class CreatePrivateGame implements WSCommandInterface {
         }
     }
 
+    public function getType() {
+        return WSCommandInterface::ON_MESSAGE_TYPE;
+    }
+
 }
