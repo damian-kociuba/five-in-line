@@ -32,7 +32,6 @@ class MakeMove implements WSCommandInterface {
     }
 
     public function run(Message $message) {
-        var_dump($this->gameSystem->getGamesRepository());
         $game = $this->getGameByConnection($this->gameSystem->getGamesRepository(), $message->getConnection());
         if (!$game) {
             throw new \Exception('This connection dont have active game');
@@ -99,7 +98,6 @@ class MakeMove implements WSCommandInterface {
     }
 
     /**
-     * 
      * @param ObjectStorage $gamesRepository
      * @param ConnectionInterface $connection
      * @return Game
