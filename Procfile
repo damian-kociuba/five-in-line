@@ -1,0 +1,1 @@
+php app/console game:server:start -v
