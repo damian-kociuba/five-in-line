@@ -28,7 +28,7 @@ class StartServerCommand extends ContainerAwareCommand {
                 $ws_manager
             )
         ),
-        8080
+        5000
     );
 
         $server->run();
