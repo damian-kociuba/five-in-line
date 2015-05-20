@@ -29,6 +29,9 @@ services:
         arguments:
             - @game_system
             
+    ws_manager.command.refresh_connection:
+        class: AppBundle\WSServer\Command\RefreshConnection
+            
     ws_manager:
         class: AppBundle\WSServer\CommandManager
         arguments: 
@@ -38,3 +41,4 @@ services:
                 - @ws_manager.command.join_to_private_game
                 - @ws_manager.command.make_move
                 - @ws_manager.command.close_game
+                - @ws_manager.command.refresh_connection
