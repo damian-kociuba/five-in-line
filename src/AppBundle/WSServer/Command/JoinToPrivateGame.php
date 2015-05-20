@@ -62,7 +62,8 @@ class JoinToPrivateGame implements WSCommandInterface {
             'command' => 'StartGame',
             'parameters' => array(
                 'playerColor' => $firstPlayerColor,
-                'isPlayerTurn' => $isFirstPlayerTurn
+                'isPlayerTurn' => $isFirstPlayerTurn,
+                'opponentName' => $secondPlayer->getName()
             )
         )));
 
@@ -70,7 +71,8 @@ class JoinToPrivateGame implements WSCommandInterface {
             'command' => 'StartGame',
             'parameters' => array(
                 'playerColor' => $secondPlayerColor,
-                'isPlayerTurn' => $isSecondPlayerTurn
+                'isPlayerTurn' => $isSecondPlayerTurn,
+                'opponentName' => $firstPlayer->getName()
             )
         )));
     }
