@@ -11,10 +11,7 @@ class ObjectStorageTest extends \PHPUnit_Framework_TestCase {
      */
     private $object;
 
-    /**
-     * @before
-     */
-    public function initiateObject() {
+    public function setUp() {
         $this->object = new ObjectStorage();
         $element1 = new \stdClass();
         $element1->key = 'abcd';

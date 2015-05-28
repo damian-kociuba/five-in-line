@@ -15,7 +15,8 @@ class Judge {
     const CONTINUE_PLAYING = 4;
 
     public function check(Board $board, Player $firstPlayer, Player $secondPlayer) {
-
+        $this->validateIsColorSet($firstPlayer);
+        $this->validateIsColorSet($secondPlayer);
         $paterns = array(
             'horizontalLine' => array(
                 array(1, 1, 1, 1, 1)
@@ -60,7 +61,12 @@ class Judge {
         }
         return self::CONTINUE_PLAYING;
     }
-
+    
+    private function validateIsColorSet(Player $player) {
+        if($player->getColor() === null) {
+            throw new \Exception(sprintf("Player %s's color is null", $player->getName()));
+        }
+    }
     /**
      * 
      * @param array $arrayPatern 2-dimension rectangular array of null/notNull values

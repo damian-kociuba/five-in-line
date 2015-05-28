@@ -10,4 +10,8 @@ interface ResponseInterface {
     public function getData();
 
     public function getName();
+    
+    public function __toString();
+    
+    public function getAsString();
 }

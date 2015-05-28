@@ -105,9 +105,8 @@ class CommandManager implements MessageComponentInterface {
         if (!($response instanceof Response\ResponseInterface)) {
             throw new \Exception('Response which is returned by command should implements ResponseInterface');
         }
-
-        $dataToSend = array('command' => $response->getName(), 'data' => $response->getData());
-        $connection->send(json_encode($dataToSend));
+        
+        $connection->send($response->getAsString());
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e) {

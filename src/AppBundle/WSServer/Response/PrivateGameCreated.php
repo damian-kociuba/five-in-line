@@ -5,7 +5,7 @@ namespace AppBundle\WSServer\Response;
 /**
  * @author dkociuba
  */
-class PrivateGameCreated implements ResponseInterface {
+class PrivateGameCreated extends Response {
 
     private $gameHashId;
 

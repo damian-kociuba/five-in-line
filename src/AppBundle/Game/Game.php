@@ -29,7 +29,7 @@ class Game {
         $this->board = new Board($boardWidth, $boardHeight);
     }
 
-    public function addPlayer(Player $player) {
+    public function addPlayer($player) {
         $this->players[] = $player;
     }
 

@@ -70,11 +70,19 @@ class MakeMove implements WSCommandInterface {
                 'isPlayerTurn' => true,
             )
         )));
-
         $judge = new Judge();
         $gameState = $judge->check($game->getBoard(), $player, $opponent);
         if ($gameState === Judge::CONTINUE_PLAYING) {
-            return;
+            if ($opponent instanceof \AppBundle\Game\AI\AIPlayer) {
+                $opponent->makeMove();
+                $game->changePlayerTurn();
+                $gameState = $judge->check($game->getBoard(), $player, $opponent);
+                if ($gameState === Judge::CONTINUE_PLAYING) {
+                    return;
+                }
+            } else {
+                return;
+            }
         }
 
         //command template
@@ -119,7 +127,9 @@ class MakeMove implements WSCommandInterface {
             throw new \Exception('Parameter x and y is required');
         }
     }
+
     public function getType() {
         return WSCommandInterface::ON_MESSAGE_TYPE;
     }
+
 }

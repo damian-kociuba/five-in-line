@@ -4,6 +4,7 @@ namespace AppBundle\WSServer\Command;
 
 use AppBundle\Game\GameSystem;
 use AppBundle\WSServer\Message;
+use AppBundle\WSServer\Response\StartGame;
 
 /**
  * @author dkociuba
@@ -48,7 +49,6 @@ class JoinToPrivateGame implements WSCommandInterface {
         $firstPlayerColor = (rand(0, 1) == 1 ? 'black' : 'white'); //randomly black or white
         $secondPlayerColor = $firstPlayerColor == 'black' ? 'white' : 'black'; //opposed color
         $isFirstPlayerTurn = rand(0, 1) == 1; //randomly true or false
-        $isSecondPlayerTurn = !$isFirstPlayerTurn;
 
         $firstPlayer->setColor($firstPlayerColor);
         $secondPlayer->setColor($secondPlayerColor);
@@ -58,23 +58,17 @@ class JoinToPrivateGame implements WSCommandInterface {
             $game->setFirstMovePlayer($secondPlayer);
         }
 
-        $firstPlayer->getConnection()->send(json_encode(array(
-            'command' => 'StartGame',
-            'parameters' => array(
-                'playerColor' => $firstPlayerColor,
-                'isPlayerTurn' => $isFirstPlayerTurn,
-                'opponentName' => $secondPlayer->getName()
-            )
-        )));
+        $responseToFirstPlayer = new StartGame();
+        $responseToFirstPlayer->setIsPlayerTurn($isFirstPlayerTurn);
+        $responseToFirstPlayer->setPlayer($firstPlayer);
+        $responseToFirstPlayer->setOpponent($secondPlayer);
+        $firstPlayer->getConnection()->send($responseToFirstPlayer);
 
-        $secondPlayer->getConnection()->send(json_encode(array(
-            'command' => 'StartGame',
-            'parameters' => array(
-                'playerColor' => $secondPlayerColor,
-                'isPlayerTurn' => $isSecondPlayerTurn,
-                'opponentName' => $firstPlayer->getName()
-            )
-        )));
+        $responseToSecondPlayer = new StartGame();
+        $responseToSecondPlayer->setIsPlayerTurn(!$isFirstPlayerTurn);
+        $responseToSecondPlayer->setPlayer($secondPlayer);
+        $responseToSecondPlayer->setOpponent($firstPlayer);
+        $secondPlayer->getConnection()->send($responseToSecondPlayer);
     }
 
     private function getFirstPlayer(\AppBundle\Game\Game $game) {

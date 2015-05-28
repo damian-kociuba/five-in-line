@@ -13,6 +13,11 @@ services:
         class: AppBundle\WSServer\Command\CreatePrivateGame
         arguments:
             - @game_system
+
+    ws_manager.command.create_game_vs_ai:
+        class: AppBundle\WSServer\Command\CreateGameVsAI
+        arguments:
+            - @game_system
             
     ws_manager.command.join_to_private_game:
         class: AppBundle\WSServer\Command\JoinToPrivateGame
@@ -38,6 +43,7 @@ services:
             - @doctrine.orm.default_entity_manager
             - 
                 - @ws_manager.command.create_private_game
+                - @ws_manager.command.create_game_vs_ai
                 - @ws_manager.command.join_to_private_game
                 - @ws_manager.command.make_move
                 - @ws_manager.command.close_game
