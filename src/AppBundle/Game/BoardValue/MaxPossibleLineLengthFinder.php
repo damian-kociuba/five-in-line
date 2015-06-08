@@ -97,7 +97,6 @@ class MaxPossibleLineLengthFinder {
         } else {
             $line->type = Line::TWO_SIDE_OPEN;
         }
-        
         return $line;
     }
 
@@ -148,11 +147,10 @@ class MaxPossibleLineLengthFinder {
         } else {
             $line->type = Line::TWO_SIDE_OPEN;
         }
-        
         return $line;
     }
 
-    private function findForDescendingLine($startX, $startY, $color) {
+    private function findForAscendingLine($startX, $startY, $color) {
         $length = 0;
         while ($startX + $length< $this->board->getWidth() && $startY - $length >= 0 && $this->board->getByXY($startX + $length, $startY - $length) == $color) {
             $length++;
@@ -205,12 +203,11 @@ class MaxPossibleLineLengthFinder {
         } else {
             $line->type = Line::TWO_SIDE_OPEN;
         }
-                
-        
+
         return $line;
     }
 
-    private function findForAscendingLine($startX, $startY, $color) {
+    private function findForDescendingLine($startX, $startY, $color) {
         $length = 0;
         while ($startX + $length < $this->board->getWidth() && $startY + $length < $this->board->getHeight() && $this->board->getByXY($startX + $length, $startY + $length) == $color) {
             $length++;
@@ -262,7 +259,10 @@ class MaxPossibleLineLengthFinder {
         } else {
             $line->type = Line::TWO_SIDE_OPEN;
         }
+        
         return $line;
+                
+
     }
 
 }

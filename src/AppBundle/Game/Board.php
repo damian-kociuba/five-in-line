@@ -25,6 +25,12 @@ class Board {
      */
     private $fields;
 
+    /**
+     * Value of situation on the board
+     * @var number
+     */
+    private $value;
+
     public function __construct($boardWidth, $boardHeight) {
         $this->width = $boardWidth;
         $this->height = $boardHeight;
@@ -75,6 +81,29 @@ class Board {
         if ($this->fields[$y][$x] !== null) {
             throw new \Exception("Field $x x $y is not empty");
         }
+    }
+
+    public function setValue($value) {
+        $this->value = $value;
+    }
+
+    public function getValue() {
+        return $this->value;
+    }
+
+    public function getAsString() {
+        $string = "\n";
+        for ($y = 0; $y < $this->height; $y++) {
+            for ($x = 0; $x < $this->width; $x++) {
+                if ($this->getByXY($x, $y) === null) {
+                    $string .= '.';
+                } else {
+                    $string .= $this->getByXY($x, $y) === 'white' ? 'O' : '#';
+                }
+            }
+            $string .= "\n";
+        }
+        return $string;
     }
 
 }

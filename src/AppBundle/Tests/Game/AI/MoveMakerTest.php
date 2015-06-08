@@ -14,15 +14,38 @@ class MoveMakerTest extends \PHPUnit_Framework_TestCase {
     private $board;
 
     /**
-     * @var MoveMaker
+     * @covers AppBundle\Game\AI\MoveMaker::getNextMoveCoordinate
      */
-    protected $object;
+    public function testGetNextMoveCoordinate_CheckIsCorrectFormat() {
+        $moveMaker = $this->generateMoveMakerSituation();
+        $move = $moveMaker->getNextMoveCoordinate();
+        $isCorrectMove = false;
+        if (is_int($move['x']) && is_int($move['y'])) {
+            $isCorrectMove = true;
+        }
+        $this->assertTrue($isCorrectMove, 'Move is inncorrect. Expected array (x=>int, y=>int) given ' . print_r($move, true));
+    }
 
     /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
+     * @covers AppBundle\Game\AI\MoveMaker::getNextMoveCoordinate
      */
-    protected function setUp() {
+    public function testGetNextMoveCoordinate() {
+        $moveMaker = $this->generateMoveMakerSituation();
+        $move = $moveMaker->getNextMoveCoordinate();
+        $isCorrectMove = false;
+        if ($move['x'] == 1 && $move['y'] == 1) {
+            $isCorrectMove = true;
+        }
+        if ($move['x'] == 6 && $move['y'] == 6) {
+            $isCorrectMove = true;
+        }
+        $this->assertTrue($isCorrectMove, 'Move is inncorrect. Expected (1,1) or (6,6), given (' . $move['x'] . ',' . $move['y'] . ')');
+    }
+
+    /**
+     * @return \AppBundle\Game\AI\MoveMaker
+     */
+    private function generateMoveMakerSituation() {
         $this->board = new \AppBundle\Game\Board(10, 10);
         /*
           ........
@@ -51,22 +74,168 @@ class MoveMakerTest extends \PHPUnit_Framework_TestCase {
         $movingPlayer->setColor('white');
         $opponent = new \AppBundle\Game\Player();
         $opponent->setColor('black');
-        $this->object = new MoveMaker($this->board, $movingPlayer, $opponent);
+        return new MoveMaker($this->board, $movingPlayer, $opponent);
     }
 
     /**
      * @covers AppBundle\Game\AI\MoveMaker::getNextMoveCoordinate
      */
-    public function testGetNextMoveCoordinate() {
-//        $move = $this->object->getNextMoveCoordinate();
-//        $isCorrectMove = false;
-//        if($move['x']==1 && $move['y']==1) {
-//            $isCorrectMove = true;
-//        }
-//        if($move['x']==6 && $move['y']==6) {
-//            $isCorrectMove = true;
-//        }
-//        $this->assertTrue($isCorrectMove, 'Move is inncorrect. Expected (1,1) or (6,6), given ('.$move['x'].','.$move['y'].')');
+    public function testGetNextMoveCoordinateWhenAreTwoThrees() {
+        $moveMaker = $this->generateMoveMakerSituationTwoThrees();
+        $move = $moveMaker->getNextMoveCoordinate();
+        $isCorrectMove = false;
+        if ($move['x'] == 1 && $move['y'] == 3) {
+            $isCorrectMove = true;
+        }
+        if ($move['x'] == 5 && $move['y'] == 7) {
+            $isCorrectMove = true;
+        }
+        $this->assertTrue($isCorrectMove, 'Move is inncorrect. Expected (1,3) or (5,7), given (' . $move['x'] . ',' . $move['y'] . ')');
+    }
+
+    /**
+     * @return \AppBundle\Game\AI\MoveMaker
+     */
+    private function generateMoveMakerSituationTwoThrees() {
+        $this->board = new \AppBundle\Game\Board(10, 10);
+        /*
+          ........
+          ........
+          ..O.....
+          ...O....
+          ..#.....
+          ...#....
+          ....#...
+          ........
+          ........
+         * O - white
+         * # - black
+         */
+        $this->board->markField(2, 2, 'white');
+        $this->board->markField(3, 3, 'white');
+
+        $this->board->markField(2, 4, 'black');
+        $this->board->markField(3, 5, 'black');
+        $this->board->markField(4, 6, 'black');
+
+        $movingPlayer = new \AppBundle\Game\Player();
+        $movingPlayer->setColor('white');
+        $opponent = new \AppBundle\Game\Player();
+        $opponent->setColor('black');
+        return new MoveMaker($this->board, $movingPlayer, $opponent);
+    }
+
+    /**
+     * @covers AppBundle\Game\AI\MoveMaker::getNextMoveCoordinate
+     */
+    public function testGetNextMoveCoordinateWhenAreTwoThrees2() {
+        $moveMaker = $this->generateMoveMakerSituationTwoThrees2();
+        $move = $moveMaker->getNextMoveCoordinate();
+        $isCorrectMove = false;
+        if ($move['x'] == 6 && $move['y'] == 3) {
+            $isCorrectMove = true;
+        }
+        if ($move['x'] == 6 && $move['y'] == 7) {
+            $isCorrectMove = true;
+        }
+        $this->assertTrue($isCorrectMove, 'Move is inncorrect. Expected (6,3) or (6,7), given (' . $move['x'] . ',' . $move['y'] . ')');
+    }
+
+    /**
+     * @return \AppBundle\Game\AI\MoveMaker
+     */
+    private function generateMoveMakerSituationTwoThrees2() {
+        $this->board = new \AppBundle\Game\Board(14, 14);
+        /*
+          .............
+          .............
+          .............
+          .............
+          ....#.O......
+          ...##.O......
+          .....#OOOO#..
+          .............
+          .............
+          .............
+          .............
+          .............
+          .............
+         * O - white
+         * # - black
+         */
+        $this->board->markField(6, 4, 'white');
+        $this->board->markField(6, 5, 'white');
+        $this->board->markField(6, 6, 'white');
+        $this->board->markField(7, 6, 'white');
+        $this->board->markField(8, 6, 'white');
+        $this->board->markField(9, 6, 'white');
+
+        $this->board->markField(3, 5, 'black');
+        $this->board->markField(4, 5, 'black');
+        $this->board->markField(4, 4, 'black');
+        $this->board->markField(5, 6, 'black');
+        $this->board->markField(10, 6, 'black');
+
+        $movingPlayer = new \AppBundle\Game\Player();
+        $movingPlayer->setColor('black');
+        $opponent = new \AppBundle\Game\Player();
+        $opponent->setColor('white');
+        return new MoveMaker($this->board, $movingPlayer, $opponent);
+    }
+    /**
+     * @covers AppBundle\Game\AI\MoveMaker::getNextMoveCoordinate
+     */
+    public function testGetNextMoveCoordinateWhenAreTwoThrees3() {
+        $moveMaker = $this->generateMoveMakerSituationTwoThrees3();
+        $move = $moveMaker->getNextMoveCoordinate();
+        $isCorrectMove = false;
+        if ($move['x'] == 6 && $move['y'] == 3) {
+            $isCorrectMove = true;
+        }
+        if ($move['x'] == 2 && $move['y'] == 7) {
+            $isCorrectMove = true;
+        }
+        $this->assertTrue($isCorrectMove, 'Move is inncorrect. Expected (6,3) or (6,7), given (' . $move['x'] . ',' . $move['y'] . ')');
+    }
+
+    /**
+     * @return \AppBundle\Game\AI\MoveMaker
+     */
+    private function generateMoveMakerSituationTwoThrees3() {
+        $this->board = new \AppBundle\Game\Board(14, 14);
+        /*
+          .............
+          .............
+          .............
+          .............
+          ...##O.......
+          ...#O#.......
+          ...O.O.......
+          .....O.......
+          .............
+          .............
+          .............
+          .............
+          .............
+         * O - white
+         * # - black
+         */
+        $this->board->markField(5, 4, 'white');
+        $this->board->markField(4, 5, 'white');
+        $this->board->markField(3, 6, 'white');
+        $this->board->markField(5, 6, 'white');
+        $this->board->markField(5, 7, 'white');
+
+        $this->board->markField(3, 4, 'black');
+        $this->board->markField(3, 5, 'black');
+        $this->board->markField(4, 4, 'black');
+        $this->board->markField(5, 5, 'black');
+
+        $movingPlayer = new \AppBundle\Game\Player();
+        $movingPlayer->setColor('black');
+        $opponent = new \AppBundle\Game\Player();
+        $opponent->setColor('white');
+        return new MoveMaker($this->board, $movingPlayer, $opponent);
     }
 
 }
