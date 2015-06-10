@@ -34,10 +34,8 @@ class AIPlayer extends \AppBundle\Game\Player {
     public function makeMove() {
         $moveMaker = new MoveMaker($this->board, $this, $this->opponent);
         $move = $moveMaker->getNextMoveCoordinate();
-        echo "Ruch komputera!\n";
         $x = $move['x'];
         $y = $move['y'];
-        var_dump($move);
         $this->board->markField($x, $y, $this->getColor());
         $this->opponent->getConnection()->send(json_encode(array(
             'command' => 'MoveMade',

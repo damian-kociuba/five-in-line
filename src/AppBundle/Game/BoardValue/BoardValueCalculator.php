@@ -52,7 +52,7 @@ class BoardValueCalculator {
 
     private function calculateValueOfLine(Line $line, $moveNext = false) {
         if ($line->length == MaxPossibleLineLengthFinder::MIN_LINE_LENGTH) {
-            return 100000; //finish of game
+            return 200000; //finish of game
         }
         if ($moveNext && $line->length == MaxPossibleLineLengthFinder::MIN_LINE_LENGTH - 1) {
             return 50000; //almost finish of game

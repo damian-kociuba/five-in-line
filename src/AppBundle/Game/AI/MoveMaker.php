@@ -57,7 +57,7 @@ class MoveMaker {
     public function getNextMoveCoordinate() {
         $timer = new Timer();
         $timer->start();
-        
+
         $this->gameTreeRoot->setValue($this->board);
         $boardValue = $this->boardValueCalculator->calculateValue($this->board, $this->movingPlayer->getColor(), $this->opponent->getColor());
         $this->gameTreeRoot->getValue()->setValue($boardValue);
@@ -237,12 +237,14 @@ class MoveMaker {
         $sum = 0;
         foreach ($nodeValues as $i => $value) {
             if ($i % 2 == 0) {
-                $sum += abs($value);
+                $sum += ($value);
+                //echo ' + ' . ($value);
             } else {
-                $sum -= abs($value);
+                $sum -= ($value);
+                //echo ' - ' . ($value);
             }
         }
-
+       // echo ' = ' . $sum . "\n";
         return $sum;
     }
 

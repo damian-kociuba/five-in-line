@@ -43,7 +43,7 @@ class BoardValueCalculatorTest extends \PHPUnit_Framework_TestCase {
     public function testCalculateValueWhenPlayerHas5LengthLine() {
         $board = $this->getExampleBoard();
         //black has 37 points board
-        $this->assertEquals(99967, $this->object->calculateValue($board, 'green', 'black'));
+        $this->assertEquals(199967, $this->object->calculateValue($board, 'green', 'black'));
     }
     
     /**
@@ -58,11 +58,9 @@ class BoardValueCalculatorTest extends \PHPUnit_Framework_TestCase {
      * @covers AppBundle\Game\BoardValue\BoardValueCalculator::calculateValue
      */
     public function testCalculateValueWhenPlayerBlock3LengthLine() {
-        $this->markTestSkipped();
         $board = $this->getExampleBoard3();
         
-        //black has 37 points board
-        $this->assertEquals(8, $this->object->calculateValue($board, 'black', 'white'));
+        $this->assertEquals(-15, $this->object->calculateValue($board, 'black', 'white'));
     }
 
     private function getExampleBoard() {
