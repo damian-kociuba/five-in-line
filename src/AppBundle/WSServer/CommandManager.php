@@ -60,7 +60,10 @@ class CommandManager implements MessageComponentInterface {
      * @param string $msg
      */
     public function onMessage(ConnectionInterface $connection, $msg) {
-        echo "Message: \n" . $msg . "\n";
+//        $connection->send('{"command":"someString","data":"data"}');
+//        sleep(10);
+//        return;
+//        echo "Message: \n" . $msg . "\n";
         $message = new Message();
         $message->setConnection($connection);
         $message->readFromJSON($msg);

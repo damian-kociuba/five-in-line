@@ -70,6 +70,9 @@ class MakeMove implements WSCommandInterface {
                 'isPlayerTurn' => true,
             )
         )));
+//        echo 'wysłano odpowiedz';
+//        sleep(5);
+//        return;
         $judge = new Judge();
         $gameState = $judge->check($game->getBoard(), $player, $opponent);
         if ($gameState === Judge::CONTINUE_PLAYING) {

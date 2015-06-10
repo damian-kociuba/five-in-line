@@ -3,6 +3,7 @@
 namespace AppBundle\Game\BoardValue;
 
 use AppBundle\Game\Board;
+use AppBundle\Benchmark\Timer;
 
 /**
  * Description of BoardValueCalculator
@@ -11,27 +12,34 @@ use AppBundle\Game\Board;
  */
 class BoardValueCalculator {
 
+    static public $calcCounter = 0;
+    static public $timer = null;
+
     /**
      * @var MaxPossibleLineLengthFinder
      */
     private $maxLineLengthFinder;
 
+    public function __construct() {
+        if (self::$timer === null) {
+            self::$timer = new Timer();
+        }
+    }
+
     public function calculateValue(Board $board, $playerColor, $opponentColor, $movingPlayerColor = null) {
+        self::$timer->continueCounting();
+        self::$calcCounter++;
         $this->maxLineLengthFinder = new MaxPossibleLineLengthFinder($board);
-        $playerLines = array();
-        $playerLines = array_merge($playerLines, $this->maxLineLengthFinder->findAll(MaxPossibleLineLengthFinder::VERTICAL_DIRECTION, $playerColor));
-        $playerLines = array_merge($playerLines, $this->maxLineLengthFinder->findAll(MaxPossibleLineLengthFinder::HORIZONTAL_DIRECTION, $playerColor));
-        $playerLines = array_merge($playerLines, $this->maxLineLengthFinder->findAll(MaxPossibleLineLengthFinder::DESCENDING_DIRECTION, $playerColor));
-        $playerLines = array_merge($playerLines, $this->maxLineLengthFinder->findAll(MaxPossibleLineLengthFinder::ASCENDING_DIRECTION, $playerColor));
-        $opponentLines = array();
-        $opponentLines = array_merge($opponentLines, $this->maxLineLengthFinder->findAll(MaxPossibleLineLengthFinder::VERTICAL_DIRECTION, $opponentColor));
-        $opponentLines = array_merge($opponentLines, $this->maxLineLengthFinder->findAll(MaxPossibleLineLengthFinder::HORIZONTAL_DIRECTION, $opponentColor));
-        $opponentLines = array_merge($opponentLines, $this->maxLineLengthFinder->findAll(MaxPossibleLineLengthFinder::DESCENDING_DIRECTION, $opponentColor));
-        $opponentLines = array_merge($opponentLines, $this->maxLineLengthFinder->findAll(MaxPossibleLineLengthFinder::ASCENDING_DIRECTION, $opponentColor));
+        $playerLines = $this->maxLineLengthFinder->findAll($playerColor);
+        $opponentLines = $this->maxLineLengthFinder->findAll($opponentColor);
 
         $isPlayerMove = ($playerColor !== $movingPlayerColor);
         $isOpponentMove = ($opponentColor !== $movingPlayerColor);
-        return $this->calculateValueOfLines($playerLines, $isPlayerMove) - $this->calculateValueOfLines($opponentLines, $isOpponentMove);
+        
+        $value = $this->calculateValueOfLines($playerLines, $isPlayerMove) - $this->calculateValueOfLines($opponentLines, $isOpponentMove);
+        
+        self::$timer->stop();
+        return $value;
     }
 
     private function calculateValueOfLines(array $lines, $moveNext = false) {
@@ -47,11 +55,10 @@ class BoardValueCalculator {
             return 100000; //finish of game
         }
         if ($moveNext && $line->length == MaxPossibleLineLengthFinder::MIN_LINE_LENGTH - 1) {
-            echo "czworka";
             return 50000; //almost finish of game
         }
         if ($line->length == 4) {
-            $value = pow($line->length, 4);
+            $value = 256; //4^4
         } else {
             $value = pow($line->length, 3);
         }

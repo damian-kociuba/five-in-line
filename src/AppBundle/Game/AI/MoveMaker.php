@@ -6,6 +6,7 @@ use AppBundle\Game\Board;
 use AppBundle\Game\Player;
 use AppBundle\Game\BoardValue\BoardValueCalculator;
 use AppBundle\Storage\Tree\TreeNode;
+use AppBundle\Benchmark\Timer;
 
 /**
  * Consist algoritm to make decision where put next pawn
@@ -54,14 +55,14 @@ class MoveMaker {
     }
 
     public function getNextMoveCoordinate() {
-
+        $timer = new Timer();
+        $timer->start();
+        
         $this->gameTreeRoot->setValue($this->board);
         $boardValue = $this->boardValueCalculator->calculateValue($this->board, $this->movingPlayer->getColor(), $this->opponent->getColor());
         $this->gameTreeRoot->getValue()->setValue($boardValue);
         echo 'drzewa liście: ' . count($this->gameTreeRoot->getLeaves()) . "\n";
         $this->prepareNextLevelOfGameTree($this->gameTreeRoot, $this->movingPlayer, $this->opponent);
-        //echo 'drzewa liście: ' . count($this->gameTreeRoot->getLeaves()) . "\n";
-        //$this->deleteTheWorstLeaves($this->gameTreeRoot);
         echo 'drzewa liście: ' . count($this->gameTreeRoot->getLeaves()) . "\n";
         $this->prepareNextLevelOfGameTree($this->gameTreeRoot, $this->opponent, $this->movingPlayer);
         echo 'drzewa liście: ' . count($this->gameTreeRoot->getLeaves()) . "\n";
@@ -70,15 +71,12 @@ class MoveMaker {
         echo 'drzewa liście: ' . count($this->gameTreeRoot->getLeaves()) . "\n";
 //        $this->deleteTheWorstLeaves($this->gameTreeRoot);
 //        echo 'drzewa liście: ' . count($this->gameTreeRoot->getLeaves()) . "\n";
-//        $this->prepareNextLevelOfGameTree($this->gameTreeRoot, $this->movingPlayer, $this->opponent);
-//        $this->deleteTheWorstLeaves($this->gameTreeRoot);
 
-        var_dump($this->gameTreeRoot->getValue()->getValue());
+
         $leaves = $this->gameTreeRoot->getLeaves();
         echo 'pobrano liscie: ' . count($leaves);
         foreach ($leaves as $i => $leaf) {
             $value = $this->calculateBranchValue($leaf);
-            echo ' = ' . $value . "\n";
             $values[$i] = $value;
         }
         //var_dump($values);
@@ -97,6 +95,11 @@ class MoveMaker {
             $node = $node->getParent();
         }
 
+        $timer->stop();
+        echo 'getNextMove: ' . $timer->getResult() . "\n";
+        echo 'sum of calculations: ' . BoardValueCalculator::$timer->getResult() . " / " . BoardValueCalculator::$calcCounter . "\n  ";
+        BoardValueCalculator::$timer->reset();
+        BoardValueCalculator::$calcCounter = 0;
         return $node->getValueOfEdgeToParent();
         //return $theBestMove;
     }
@@ -114,7 +117,7 @@ class MoveMaker {
         }
     }
 
-    private function addNextMoves(TreeNode $node, Player $movingPlayer, Player $opponent) {
+    private function addNextMoves(TreeNode $node, Player $movingPlayer) {
         $board = $node->getValue();
         $boardCalculator = new BoardValueCalculator();
 
@@ -125,8 +128,8 @@ class MoveMaker {
                     continue;
                 }
                 $needsToCheck = false;
-                for ($sx = max(0, $x - 2); $sx < min($this->board->getWidth(), $x + 3); $sx++) {
-                    for ($sy = max(0, $y - 2); $sy < min($this->board->getHeight(), $y + 3); $sy++) {
+                for ($sx = max(0, $x - 1); $sx < min($this->board->getWidth(), $x + 2); $sx++) {
+                    for ($sy = max(0, $y - 1); $sy < min($this->board->getHeight(), $y + 2); $sy++) {
                         if ($board->getByXY($sx, $sy) !== null) {
                             $needsToCheck = true;
                         }
@@ -138,7 +141,6 @@ class MoveMaker {
 
                 $newBoard = clone $board;
                 $newBoard->markField($x, $y, $movingPlayer->getColor());
-                unset($_GET['deb']);
                 $boardValue = $boardCalculator->calculateValue($newBoard, $this->movingPlayer->getColor(), $this->opponent->getColor(), $movingPlayer->getColor());
 
                 if ($movingPlayer == $this->opponent) {
@@ -158,19 +160,21 @@ class MoveMaker {
         }
     }
 
+    /**
+     * @deprecated 
+     * @param TreeNode $node
+     */
     private function deleteTheWorstLeaves(TreeNode $node) {
         $leaves = $node->getLeaves();
         $fun = function (TreeNode $a, TreeNode $b) {
             return $a->getValue()->getValue() - $b->getValue()->getValue();
         };
-        var_dump(count($leaves));
         usort($leaves, $fun);
 
         $leavesToDelete = array_slice($leaves, 0, max((int) (count($leaves) * 0.90), count($leaves) - 10));
         foreach ($leavesToDelete as $leaf) {
             $this->deleteLeaf($leaf);
         }
-        echo 'usunieto';
     }
 
     private function deleteLeaf(TreeNode $node) {
@@ -204,7 +208,7 @@ class MoveMaker {
         if (empty($leavesOfBranch)) {
             return;
         }
-        
+
         $maxNode = $leavesOfBranch[0];
         foreach ($leavesOfBranch as $leaf) {
             if ($leaf->getValue()->getValue() > $maxNode->getValue()->getValue()) {
@@ -234,10 +238,8 @@ class MoveMaker {
         foreach ($nodeValues as $i => $value) {
             if ($i % 2 == 0) {
                 $sum += abs($value);
-                echo ' + ' . abs($value);
             } else {
                 $sum -= abs($value);
-                echo ' - ' . abs($value);
             }
         }
 

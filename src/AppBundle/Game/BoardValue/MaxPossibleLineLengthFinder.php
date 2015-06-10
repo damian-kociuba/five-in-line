@@ -29,20 +29,27 @@ class MaxPossibleLineLengthFinder {
         $this->board = $board;
     }
 
-    public function findAll($direction, $color) {
+    public function findAll($color) {
         $lines = array();
         for ($x = 0; $x < $this->board->getWidth(); $x++) {
             for ($y = 0; $y < $this->board->getHeight(); $y++) {
-                switch ($direction) {
-                    case self::HORIZONTAL_DIRECTION: $line = $this->findForHorizontalLine($x, $y, $color);
-                        break;
-                    case self::VERTICAL_DIRECTION: $line = $this->findForVerticalLine($x, $y, $color);
-                        break;
-                    case self::ASCENDING_DIRECTION: $line = $this->findForAscendingLine($x, $y, $color);
-                        break;
-                    case self::DESCENDING_DIRECTION: $line = $this->findForDescendingLine($x, $y, $color);
-                        break;
+                if($this->board->getByXY($x, $y)===null) {
+                    continue;
                 }
+                $line = $this->findForHorizontalLine($x, $y, $color);
+                if ($line !== null) {
+                    $lines[] = $line;
+                }
+                $line = $this->findForVerticalLine($x, $y, $color);
+                if ($line !== null) {
+                    $lines[] = $line;
+                }
+                $line = $this->findForAscendingLine($x, $y, $color);
+                if ($line !== null) {
+                    $lines[] = $line;
+                }
+                $line = $this->findForDescendingLine($x, $y, $color);
+
                 if ($line !== null) {
                     $lines[] = $line;
                 }
@@ -53,7 +60,7 @@ class MaxPossibleLineLengthFinder {
 
     private function findForHorizontalLine($startX, $startY, $color) {
         $length = 0;
-        while ($startX + $length< $this->board->getWidth() && $this->board->getByXY($startX + $length, $startY) == $color) {
+        while ($startX + $length < $this->board->getWidth() && $this->board->getByXY($startX + $length, $startY) == $color) {
             $length++;
         }
         if ($length == 0) {
@@ -97,6 +104,7 @@ class MaxPossibleLineLengthFinder {
         } else {
             $line->type = Line::TWO_SIDE_OPEN;
         }
+        $line->direction = Line::HORIZONTAL_DIRECTION;
         return $line;
     }
 
@@ -147,12 +155,13 @@ class MaxPossibleLineLengthFinder {
         } else {
             $line->type = Line::TWO_SIDE_OPEN;
         }
+        $line->direction = Line::VERTICAL_DIRECTION;
         return $line;
     }
 
     private function findForAscendingLine($startX, $startY, $color) {
         $length = 0;
-        while ($startX + $length< $this->board->getWidth() && $startY - $length >= 0 && $this->board->getByXY($startX + $length, $startY - $length) == $color) {
+        while ($startX + $length < $this->board->getWidth() && $startY - $length >= 0 && $this->board->getByXY($startX + $length, $startY - $length) == $color) {
             $length++;
         }
         if ($length == 0) {
@@ -192,7 +201,7 @@ class MaxPossibleLineLengthFinder {
                 break;
             }
         }
-        
+
         if ($length + $nextFreePlayces + $backFreePlayces < self::MIN_LINE_LENGTH) {
             return null;
         }
@@ -203,7 +212,7 @@ class MaxPossibleLineLengthFinder {
         } else {
             $line->type = Line::TWO_SIDE_OPEN;
         }
-
+        $line->direction = Line::ASCENDING_DIRECTION;
         return $line;
     }
 
@@ -259,10 +268,8 @@ class MaxPossibleLineLengthFinder {
         } else {
             $line->type = Line::TWO_SIDE_OPEN;
         }
-        
+        $line->direction = Line::DESCENDING_DIRECTION;
         return $line;
-                
-
     }
 
 }

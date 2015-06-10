@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Ratchet\Server\IoServer;
 use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
+use Ratchet\Wamp\WampServer;
 
 /**
  * @author dkociuba
@@ -26,17 +27,14 @@ class StartServerCommand extends ContainerAwareCommand {
         $ws_manager = $this->getContainer()->get('ws_manager');
         $port = $input->getArgument('port');
         $server = IoServer::factory(
-        new HttpServer(
-            new WsServer(
-                $ws_manager
-            )
-        ),
-        $port
-    );
-echo "\nServer run at port $port\n";
+                        new HttpServer(
+                            new WsServer(
+                                $ws_manager
+                            )
+                        ), $port
+        );
+        echo "\nServer run at port $port\n";
         $server->run();
-        
-        
     }
 
 }
