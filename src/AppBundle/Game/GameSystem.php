@@ -3,7 +3,7 @@
 namespace AppBundle\Game;
 
 use AppBundle\Storage\ObjectStorage;
-
+use Appbundle\ConfigContainer;
 /**
  * Description of GameSystem
  *
@@ -17,14 +17,13 @@ class GameSystem {
     private $gamesRepository;
 
     /**
-     * @var array
+     * @var ConfigContainer
      */
-    private $configValues;
+    private $config;
 
-    public function __construct($configValues) {
-        $this->configValues = $configValues;
+    public function __construct(ConfigContainer $config) {
+        $this->config = $config;
         $this->gamesRepository = new ObjectStorage();
-        echo 'Game system construct';
     }
 
     /**
@@ -37,28 +36,7 @@ class GameSystem {
 
 ### Refactoring: Move  functions below to other place
 
-    /**
-     * @param Player $playerCreator
-     * @return PrivateGame
-     */
-    public function createPrivateGame(Player $playerCreator) {
-        $game = new PrivateGame($this->configValues['boardWidth'], $this->configValues['boardHeight']);
-
-        $game->addPlayer($playerCreator);
-        $game->setHashId(uniqid());
-        return $game;
-    }
-    /**
-     * @param Player $playerCreator
-     * @return AI\AIGame
-     */
-    public function createAIGame(Player $playerCreator) {
-        $game = new AI\AIGame($this->configValues['boardWidth'], $this->configValues['boardHeight']);
-
-        $game->addPlayer($playerCreator);
-        return $game;
-    }
-
+    
     /**
      * 
      * @param string $name

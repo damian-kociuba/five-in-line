@@ -2,6 +2,7 @@
 
 namespace AppBundle\WSServer\Command;
 
+use Appbundle\ConfigContainer;
 use AppBundle\Tests\WSServer\ConnectionMock;
 use AppBundle\Game\Player;
 use AppBundle\Game\Game;
@@ -40,7 +41,11 @@ class MakeMoveTest extends \PHPUnit_Framework_TestCase {
      * This method is called before a test is executed.
      */
     protected function setUp() {
-        $gameSystem = new \AppBundle\Game\GameSystem(array('boardWidth' => self::BOARD_WIDTH, 'boardHeight' => self::BOARD_HEIGHT));
+        $config = new ConfigContainer(array(
+            'boardWidth' => self::BOARD_WIDTH,
+            'boardHeight' => self::BOARD_HEIGHT)
+        );
+        $gameSystem = new \AppBundle\Game\GameSystem($config);
         $this->movingPlayer = $gameSystem->createPlayer('FirstPlayer');
         $this->movingPlayer->setConnection(new ConnectionMock());
         $this->movingPlayer->setColor('white');
@@ -71,7 +76,7 @@ class MakeMoveTest extends \PHPUnit_Framework_TestCase {
     public function testRunCheckSendedMessageToSecondPlayer() {
         $message = $this->prepareMessage();
         $this->object->run($message);
-        $secondPlayerMessage = json_decode($this->secondPlayer->getConnection()->getSendedData(),true);
+        $secondPlayerMessage = json_decode($this->secondPlayer->getConnection()->getSendedData(), true);
         $expectedMessage = array(
             'command' => 'MoveMade',
             'parameters' => array(

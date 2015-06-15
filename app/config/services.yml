@@ -4,11 +4,21 @@ parameters:
 #    parameter_name: value
 
 services:
+    config_container:
+        class: AppBundle\ConfigContainer
+        arguments:
+            - {boardWidth: 20, boardHeight: 20}
+            
     game_system:
         class: AppBundle\Game\GameSystem
         arguments:
-            - {boardWidth: 20, boardHeight: 20}
+            - @config_container
         
+    game_builder:
+        class: AppBundle\Game\GameBuilder
+        arguments:
+            - @config_container
+            
     ws_manager.command.create_private_game:
         class: AppBundle\WSServer\Command\CreatePrivateGame
         arguments:
