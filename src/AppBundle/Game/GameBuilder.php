@@ -7,7 +7,8 @@ use AppBundle\Game\GameBuilder\PublicGameBuilder;
 use AppBundle\Game\GameBuilder\AIGameBuilder;
 use AppBundle\Game\GameBuilder\GameBuilderInterface;
 use AppBundle\Game\Player;
-use Appbundle\ConfigContainer;
+use AppBundle\ConfigContainer;
+use AppBundle\Game\Game;
 
 /**
  * Description of GameBuilder
@@ -40,6 +41,11 @@ class GameBuilder {
         $this->creator = $creator;
     }
 
+    /**
+     * 
+     * @param type $type
+     * @return Game
+     */
     public function createGame($type) {
         $builder = $this->getBuilder($type);
 

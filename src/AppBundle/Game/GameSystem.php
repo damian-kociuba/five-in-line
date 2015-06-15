@@ -3,7 +3,7 @@
 namespace AppBundle\Game;
 
 use AppBundle\Storage\ObjectStorage;
-use Appbundle\ConfigContainer;
+use AppBundle\ConfigContainer;
 /**
  * Description of GameSystem
  *

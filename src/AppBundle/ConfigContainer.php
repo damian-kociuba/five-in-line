@@ -1,6 +1,6 @@
 <?php
 
-namespace Appbundle;
+namespace AppBundle;
 
 /**
  * Description of ConfigContainer

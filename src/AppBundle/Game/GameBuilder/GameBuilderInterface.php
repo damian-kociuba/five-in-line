@@ -3,7 +3,7 @@
 namespace AppBundle\Game\GameBuilder;
 
 use AppBundle\Game\Game;
-use Appbundle\ConfigContainer;
+use AppBundle\ConfigContainer;
 /**
  *
  * @author dkociuba

@@ -3,7 +3,7 @@
 namespace AppBundle\Game\GameBuilder;
 
 use AppBundle\Game\PrivateGame;
-use Appbundle\ConfigContainer;
+use AppBundle\ConfigContainer;
 
 /**
  * Description of PrivateGameBuilder

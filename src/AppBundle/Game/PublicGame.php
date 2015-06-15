@@ -10,7 +10,7 @@ namespace AppBundle\Game;
 class PublicGame extends Game {
 
     public function isPossibleToJoin() {
-        return $this->getPlayers()===1;
+        return count($this->getPlayers())===1;
     }
 
 }

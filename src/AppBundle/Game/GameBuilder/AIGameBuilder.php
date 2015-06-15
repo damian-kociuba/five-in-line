@@ -3,7 +3,7 @@
 namespace AppBundle\Game\GameBuilder;
 
 use AppBundle\Game\AI\AIGame;
-use Appbundle\ConfigContainer;
+use AppBundle\ConfigContainer;
 
 /**
  * Description of PublicGameBuilder

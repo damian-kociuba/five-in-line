@@ -19,18 +19,17 @@ class PublicGamesManager {
         $this->gameRepository = $gameRepository;
     }
     
-    public function getJoinableGame() {
-        
+    public function getFirstJoinableGame() {
+        foreach($this->gameRepository as $game) {
+            if(! $game instanceof PublicGame) {
+                continue;
+            }
+            
+            if($game->isPossibleToJoin()) {
+                return $game;
+            }
+        }
+        return null;
     }
     
-    /**
-     * @param Player $playerCreator
-     * @return PrivateGame
-     */
-    public function createPublicGame(Player $playerCreator) {
-        $game = new PublicGame($this->configValues['boardWidth'], $this->configValues['boardHeight']);
-
-        $game->addPlayer($playerCreator);
-        return $game;
-    }
 }

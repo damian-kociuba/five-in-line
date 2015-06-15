@@ -3,7 +3,7 @@
 namespace AppBundle\Game\GameBuilder;
 
 use AppBundle\Game\PublicGame;
-
+use AppBundle\ConfigContainer;
 /**
  * Description of PublicGameBuilder
  *
