@@ -68,24 +68,6 @@ class MakeMoveTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers AppBundle\WSServer\Command\MakeMove::run
      */
-    public function testRunCheckSendedMessageToMovingPlayer() {
-        $message = $this->prepareMessage();
-        $this->object->run($message);
-        $movingPlayerMessage = json_decode($this->movingPlayer->getConnection()->getSendedData(),true);
-        $expectedMessage = array(
-            'command' => 'MoveMade',
-            'parameters' => array(
-                'x' => 5,
-                'y' => 6,
-                'isPlayerTurn' => false,
-                'color' => $this->movingPlayer->getColor()
-        ));
-        $this->assertEquals(($expectedMessage), $movingPlayerMessage);
-    }
-
-    /**
-     * @covers AppBundle\WSServer\Command\MakeMove::run
-     */
     public function testRunCheckSendedMessageToSecondPlayer() {
         $message = $this->prepareMessage();
         $this->object->run($message);
