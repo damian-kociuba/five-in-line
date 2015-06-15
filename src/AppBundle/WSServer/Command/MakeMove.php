@@ -52,7 +52,7 @@ class MakeMove implements WSCommandInterface {
         $game->getBoard()->markField($parameters['x'], $parameters['y'], $player->getColor());
         $game->changePlayerTurn();
 
-        $player->getConnection()->send(json_encode(array(
+        /*$player->getConnection()->send(json_encode(array(
             'command' => 'MoveMade',
             'parameters' => array(
                 'color' => $player->getColor(),
@@ -60,7 +60,7 @@ class MakeMove implements WSCommandInterface {
                 'y' => $parameters['y'],
                 'isPlayerTurn' => false,
             )
-        )));
+        )));*/
         $opponent->getConnection()->send(json_encode(array(
             'command' => 'MoveMade',
             'parameters' => array(
