@@ -2,7 +2,7 @@
 
 namespace AppBundle\WSServer\Command;
 
-use AppBundle\Game\GameSystem;
+use AppBundle\Game\GamesRepository;
 use AppBundle\WSServer\Response\PrivateGameCreated;
 use AppBundle\Storage\ObjectStorage;
 use AppBundle\WSServer\Message;
@@ -14,26 +14,25 @@ class CloseGame implements WSCommandInterface {
 
     /**
      *
-     * @var GameSystem
+     * @var GamesRepository
      */
-    private $gameSystem;
+    private $gamesRepository;
 
-    public function __construct(GameSystem $gameSystem) {
-        $this->gameSystem = $gameSystem;
+    public function __construct(GamesRepository $gamesRepository) {
+        $this->gamesRepository = $gamesRepository;
     }
 
     public function run(Message $message) {
         echo 'close game';
         $connection = $message->getConnection();
-        $gamesRepository = $this->gameSystem->getGamesRepository();
 
-        $gameToClose = $this->getGameByConnection($gamesRepository, $connection);
+        $gameToClose = $this->getGameByConnection($this->gamesRepository, $connection);
         if ($gameToClose === null) {
             echo ' - nothing to close';
             return;
         }
         
-        $gamesRepository->detach($gameToClose);
+        $this->gamesRepository->detach($gameToClose);
         $players = $gameToClose->getPlayers();
         foreach ($players as $player) {
             $currentConnection = $player->getConnection();

@@ -2,9 +2,10 @@
 
 namespace AppBundle\WSServer\Command;
 
-use AppBundle\Game\GameSystem;
+use AppBundle\Game\GamesRepository;
 use AppBundle\WSServer\Response\PrivateGameCreated;
 use AppBundle\WSServer\Message;
+use AppBundle\Game\PlayerBuilder;
 
 /**
  * @author dkociuba
@@ -13,21 +14,24 @@ class CreateOrJoinPublicGame implements WSCommandInterface {
 
     /**
      *
-     * @var GameSystem
+     * @var GamesRepository
      */
-    private $gameSystem;
+    private $gamesRepository;
 
-    public function __construct(GameSystem $gameSystem) {
-        $this->gameSystem = $gameSystem;
+    public function __construct(GamesRepository $gamesRepository) {
+        $this->gamesRepository = $gamesRepository;
     }
 
     public function run(Message $message) {
         $parameters = $message->getParameters();
         echo 'Create Public Game';
-        $player = $this->gameSystem->createPlayer($parameters['playerName']);
+         $playerBuilder = new PlayerBuilder();
+        
+        $playerBuilder->setPlayerName($parameters['playerName']);
+        $player = $playerBuilder->createPlayer(PlayerBuilder::HUMAN_PLAYER);
         $player->setConnection($message->getConnection());
-        $game = $this->gameSystem->createPrivateGame($player);
-        $this->gameSystem->getGamesRepository()->attach($game);
+        //$game = $this->gamesRepository->createPrivateGame($player);
+        //$this->gamesRepository->attach($game);
 
         $response = new PrivateGameCreated();
         $response->setGameHashId($game->getHashId());

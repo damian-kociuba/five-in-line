@@ -2,8 +2,9 @@
 
 namespace AppBundle\WSServer\Command;
 
-use AppBundle\Game\GameSystem;
+use AppBundle\Game\GamesRepository;
 use AppBundle\Game\GameBuilder;
+use AppBundle\Game\PlayerBuilder;
 use AppBundle\WSServer\Response\PrivateGameCreated;
 use AppBundle\WSServer\Message;
 
@@ -13,29 +14,32 @@ use AppBundle\WSServer\Message;
 class CreatePrivateGame implements WSCommandInterface {
 
     /**
-     * @var GameSystem
+     * @var GamesRepository
      */
-    private $gameSystem;
+    private $gamesRepository;
     /**
      * @var GameBuilder
      */
     private $gameBuilder;
 
-    public function __construct(GameSystem $gameSystem, GameBuilder $gameBuilder) {
-        $this->gameSystem = $gameSystem;
+    public function __construct(GamesRepository $gamesRepository, GameBuilder $gameBuilder) {
+        $this->gamesRepository = $gamesRepository;
         $this->gameBuilder = $gameBuilder;
     }
 
     public function run(Message $message) {
         $parameters = $message->getParameters();
         echo 'Create Private Game';
-        $player = $this->gameSystem->createPlayer($parameters['playerName']);
+         $playerBuilder = new PlayerBuilder();
+        
+        $playerBuilder->setPlayerName($parameters['playerName']);
+        $player = $playerBuilder->createPlayer(PlayerBuilder::HUMAN_PLAYER);
         $player->setConnection($message->getConnection());
         
         $this->gameBuilder->setCreator($player);
         $game = $this->gameBuilder->createGame(GameBuilder::PRIVATE_GAME);
         
-        $this->gameSystem->getGamesRepository()->attach($game);
+        $this->gamesRepository->attach($game);
 
         $response = new PrivateGameCreated();
         $response->setGameHashId($game->getHashId());

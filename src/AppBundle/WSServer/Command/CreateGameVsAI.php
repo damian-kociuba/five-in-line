@@ -2,8 +2,9 @@
 
 namespace AppBundle\WSServer\Command;
 
-use AppBundle\Game\GameSystem;
+use AppBundle\Game\GamesRepository;
 use AppBundle\Game\GameBuilder;
+use AppBundle\Game\PlayerBuilder;
 use AppBundle\WSServer\Response\StartGame;
 use AppBundle\WSServer\Message;
 
@@ -13,26 +14,32 @@ use AppBundle\WSServer\Message;
 class CreateGameVsAI implements WSCommandInterface {
 
     /**
-     * @var GameSystem
+     * @var GamesRepository
      */
-    private $gameSystem;
+    private $gamesRepository;
 
     /**
      * @var GameBuilder
      */
     private $gameBuilder;
 
-    public function __construct(GameSystem $gameSystem, GameBuilder $gameBuilder) {
-        $this->gameSystem = $gameSystem;
+    public function __construct(GamesRepository $gamesRepository, GameBuilder $gameBuilder) {
+        $this->gamesRepository = $gamesRepository;
         $this->gameBuilder = $gameBuilder;
     }
 
     public function run(Message $message) {
         echo 'Create Game vs AI';
-        $player = $this->gameSystem->createPlayer('Player');
+        $playerBuilder = new PlayerBuilder();
+        
+        $playerBuilder->setPlayerName('Player');
+        $player = $playerBuilder->createPlayer(PlayerBuilder::AI_PLAYER);
+        
         $player->setConnection($message->getConnection());
         $player->setColor('white');
-        $opponent = $this->gameSystem->createAIPlayer('Computer');
+        
+        $playerBuilder->setPlayerName('Computer');
+        $opponent = $playerBuilder->createPlayer(PlayerBuilder::AI_PLAYER);
         $opponent->setColor('black');
         $opponent->setOpponent($player);
 
@@ -42,10 +49,9 @@ class CreateGameVsAI implements WSCommandInterface {
         $opponent->setBoard($game->getBoard());
         $game->addPlayer($opponent);
 
-        var_dump(get_class($opponent));
 
         $game->setFirstMovePlayer($player);
-        $this->gameSystem->getGamesRepository()->attach($game);
+        $this->gamesRepository->attach($game);
         $response = new StartGame();
         $response->setIsPlayerTurn(true);
         $response->setPlayer($player);

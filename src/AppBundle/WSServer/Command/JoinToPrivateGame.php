@@ -2,9 +2,10 @@
 
 namespace AppBundle\WSServer\Command;
 
-use AppBundle\Game\GameSystem;
+use AppBundle\Game\GamesRepository;
 use AppBundle\WSServer\Message;
 use AppBundle\WSServer\Response\StartGame;
+use AppBundle\Game\PlayerBuilder;
 
 /**
  * @author dkociuba
@@ -13,12 +14,12 @@ class JoinToPrivateGame implements WSCommandInterface {
 
     /**
      *
-     * @var GameSystem
+     * @var GamesRepository
      */
-    private $gameSystem;
+    private $gamesRepository;
 
-    public function __construct(GameSystem $gameSystem) {
-        $this->gameSystem = $gameSystem;
+    public function __construct(GamesRepository $gamesRepository) {
+        $this->gamesRepository = $gamesRepository;
     }
 
     public function getCommandName() {
@@ -40,9 +41,14 @@ class JoinToPrivateGame implements WSCommandInterface {
         $gameHash = $parameters['gameHash'];
         $playerName = $parameters['playerName'];
 
-        $game = $this->gameSystem->getGamesRepository()->findFirstBy(array('hashId' => $gameHash));
+        $game = $this->gamesRepository->findFirstBy(array('hashId' => $gameHash));
         $firstPlayer = $this->getFirstPlayer($game);
-        $secondPlayer = $this->gameSystem->createPlayer($playerName);
+        
+        $playerBuilder = new PlayerBuilder();
+        
+        $playerBuilder->setPlayerName($playerName);
+        $secondPlayer = $playerBuilder->createPlayer(PlayerBuilder::HUMAN_PLAYER);
+        
         $secondPlayer->setConnection($message->getConnection());
         $game->addPlayer($secondPlayer);
 

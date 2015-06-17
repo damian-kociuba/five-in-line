@@ -3,7 +3,7 @@
 namespace AppBundle\WSServer\Command;
 
 use AppBundle\WSServer\Message;
-use AppBundle\Game\GameSystem;
+use AppBundle\Game\GamesRepository;
 use AppBundle\Storage\ObjectStorage;
 use AppBundle\Game\Game;
 use AppBundle\Game\Judge;
@@ -19,12 +19,12 @@ class MakeMove implements WSCommandInterface {
 
     /**
      *
-     * @var GameSystem
+     * @var GamesRepository
      */
-    private $gameSystem;
+    private $gamesRepository;
 
-    public function __construct(GameSystem $gameSystem) {
-        $this->gameSystem = $gameSystem;
+    public function __construct(GamesRepository $gamesRepository) {
+        $this->gamesRepository = $gamesRepository;
     }
 
     public function getCommandName() {
@@ -32,7 +32,7 @@ class MakeMove implements WSCommandInterface {
     }
 
     public function run(Message $message) {
-        $game = $this->getGameByConnection($this->gameSystem->getGamesRepository(), $message->getConnection());
+        $game = $this->getGameByConnection($this->gamesRepository, $message->getConnection());
         if (!$game) {
             throw new \Exception('This connection dont have active game');
         }

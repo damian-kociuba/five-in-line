@@ -9,10 +9,8 @@ services:
         arguments:
             - {boardWidth: 20, boardHeight: 20}
             
-    game_system:
-        class: AppBundle\Game\GameSystem
-        arguments:
-            - @config_container
+    games_repository:
+        class: AppBundle\Game\GamesRepository
         
     game_builder:
         class: AppBundle\Game\GameBuilder
@@ -22,27 +20,29 @@ services:
     ws_manager.command.create_private_game:
         class: AppBundle\WSServer\Command\CreatePrivateGame
         arguments:
-            - @game_system
+            - @games_repository
+            - @game_builder
 
     ws_manager.command.create_game_vs_ai:
         class: AppBundle\WSServer\Command\CreateGameVsAI
         arguments:
-            - @game_system
+            - @games_repository
+            - @game_builder
             
     ws_manager.command.join_to_private_game:
         class: AppBundle\WSServer\Command\JoinToPrivateGame
         arguments:
-            - @game_system
+            - @games_repository
             
     ws_manager.command.make_move:
         class: AppBundle\WSServer\Command\MakeMove
         arguments:
-            - @game_system
+            - @games_repository
             
     ws_manager.command.close_game:
         class: AppBundle\WSServer\Command\CloseGame
         arguments:
-            - @game_system
+            - @games_repository
             
     ws_manager.command.refresh_connection:
         class: AppBundle\WSServer\Command\RefreshConnection

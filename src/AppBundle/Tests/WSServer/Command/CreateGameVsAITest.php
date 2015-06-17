@@ -2,7 +2,7 @@
 
 namespace AppBundle\WSServer\Command;
 
-use AppBundle\Game\GameSystem;
+use AppBundle\Game\GamesRepository;
 use AppBundle\Tests\WSServer\ConnectionMock;
 use AppBundle\ConfigContainer;
 
@@ -17,9 +17,9 @@ class CreateGameVsAITest extends \PHPUnit_Framework_TestCase {
     protected $object;
 
     /**
-     * @var GameSystem
+     * @var GamesRepository
      */
-    private $gameSystem;
+    private $gamesRepository;
 
     /**
      * @var ConnectionMock
@@ -35,8 +35,8 @@ class CreateGameVsAITest extends \PHPUnit_Framework_TestCase {
             'boardHeight' => 20
         ));
         $gameBuilder = new \AppBundle\Game\GameBuilder($config);
-        $this->gameSystem = new GameSystem($config);
-        $this->object = new CreateGameVsAI($this->gameSystem, $gameBuilder);
+        $this->gamesRepository = new GamesRepository();
+        $this->object = new CreateGameVsAI($this->gamesRepository, $gameBuilder);
         $this->connection = new ConnectionMock();
     }
 
@@ -47,7 +47,7 @@ class CreateGameVsAITest extends \PHPUnit_Framework_TestCase {
         $message = new \AppBundle\WSServer\Message();
         $message->setConnection($this->connection);
         $this->object->run($message);
-        $this->assertEquals(1, $this->gameSystem->getGamesRepository()->count());
+        $this->assertEquals(1, $this->gamesRepository->count());
     }
 
     /**
@@ -58,8 +58,8 @@ class CreateGameVsAITest extends \PHPUnit_Framework_TestCase {
         $message->setConnection($this->connection);
 
         $this->object->run($message);
-        $this->gameSystem->getGamesRepository()->rewind();
-        $this->assertInstanceOf('\AppBundle\Game\AI\AIGame', $this->gameSystem->getGamesRepository()->current());
+        $this->gamesRepository->rewind();
+        $this->assertInstanceOf('\AppBundle\Game\AI\AIGame', $this->gamesRepository->current());
     }
     /**
      * @covers AppBundle\WSServer\Command\CreateGameVsAI::run

@@ -2,8 +2,9 @@
 
 namespace AppBundle\WSServer\Command;
 
-use AppBundle\Game\GameSystem;
+use AppBundle\Game\GamesRepository;
 use AppBundle\Game\GameBuilder;
+use AppBundle\Game\PlayerBuilder;
 use AppBundle\ConfigContainer;
 
 /**
@@ -20,26 +21,31 @@ class JoinToPrivateGameTest extends \PHPUnit_Framework_TestCase {
     protected $object;
 
     /**
-     * @var GameSystem
+     * @var GamesRepository
      */
-    private $gameSystem;
+    private $gamesRepository;
 
     protected function setUp() {
         $config = new ConfigContainer(array(
             'boardWidth' => 20,
             'boardHeight' => 20
         ));
-        $this->gameSystem = new GameSystem($config);
-        $player = $this->gameSystem->createPlayer('firstPlayer');
+        $this->gamesRepository = new GamesRepository();
+        
+        $playerBuilder = new PlayerBuilder();
+        
+        $playerBuilder->setPlayerName('firstPlayer');
+        $player = $playerBuilder->createPlayer(PlayerBuilder::HUMAN_PLAYER);
+        
         $connection = new \AppBundle\Tests\WSServer\ConnectionMock();
         $player->setConnection($connection);
         $gameBuilder = new GameBuilder($config);
         $gameBuilder->setCreator($player);
         $game = $gameBuilder->createGame(GameBuilder::PRIVATE_GAME);
         $game->setHashId(self::TEST_GAME_HASH);
-        $this->gameSystem->getGamesRepository()->attach($game);
+        $this->gamesRepository->attach($game);
 
-        $this->object = new JoinToPrivateGame($this->gameSystem);
+        $this->object = new JoinToPrivateGame($this->gamesRepository);
     }
 
     /**
@@ -71,14 +77,14 @@ class JoinToPrivateGameTest extends \PHPUnit_Framework_TestCase {
 
         $message = $this->prepareMessage();
         $this->object->run($message);
-        $game = $this->gameSystem->getGamesRepository()->current(); //there is only one game
+        $game = $this->gamesRepository->current(); //there is only one game
         $this->assertEquals(2, count($game->getPlayers()));
     }
 
     public function testRunAfterJoinAddedPlayerIsCorrect() {
         $message = $this->prepareMessage();
         $this->object->run($message);
-        $game = $this->gameSystem->getGamesRepository()->current(); //there is only one game
+        $game = $this->gamesRepository->current(); //there is only one game
         $addedPlayer = $game->getPlayers()[1]; //second player
         $this->assertEquals(self::TEST_PLAYER_NAME, $addedPlayer->getName());
     }
@@ -86,7 +92,7 @@ class JoinToPrivateGameTest extends \PHPUnit_Framework_TestCase {
     public function testRunAfterJoinMessageIsSendedToFirstPlayer() {
         $message = $this->prepareMessage();
         $this->object->run($message);
-        $game = $this->gameSystem->getGamesRepository()->current(); //there is only one game
+        $game = $this->gamesRepository->current(); //there is only one game
         $firstPlayer = $game->getPlayers()[0];
         $connectionMock = $firstPlayer->getConnection();
         $sendedData = json_decode($connectionMock->getSendedData(), true);
