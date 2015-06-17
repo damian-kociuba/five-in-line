@@ -7,15 +7,19 @@
  */
 
 namespace AppBundle\Game\PlayerBuilder;
+
 use AppBundle\Game\Player;
+
 /**
  *
  * @author dkociuba
  */
 interface PlayerBuilderInterface {
+
     public function setName($name);
+
     /**
-     * return Player
+     * @return Player
      */
     public function build();
 }

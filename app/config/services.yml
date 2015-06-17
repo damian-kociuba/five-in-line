@@ -22,6 +22,12 @@ services:
         arguments:
             - @games_repository
             - @game_builder
+            
+    ws_manager.command.create_or_join_public_game:
+        class: AppBundle\WSServer\Command\CreateOrJoinPublicGame
+        arguments:
+            - @games_repository
+            - @game_builder
 
     ws_manager.command.create_game_vs_ai:
         class: AppBundle\WSServer\Command\CreateGameVsAI
@@ -54,6 +60,7 @@ services:
             - 
                 - @ws_manager.command.create_private_game
                 - @ws_manager.command.create_game_vs_ai
+                - @ws_manager.command.create_or_join_public_game
                 - @ws_manager.command.join_to_private_game
                 - @ws_manager.command.make_move
                 - @ws_manager.command.close_game

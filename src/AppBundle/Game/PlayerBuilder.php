@@ -4,6 +4,7 @@ namespace AppBundle\Game;
 use AppBundle\Game\PlayerBuilder\AIPlayerBuilder;
 use AppBundle\Game\PlayerBuilder\HumanPlayerBuilder;
 use AppBundle\Game\PlayerBuilder\PlayerBuilderInterface;
+use AppBundle\Game\Player;
 /**
  * Description of PlayerBuilder
  *
@@ -19,7 +20,11 @@ class PlayerBuilder {
     public function setPlayerName($name) {
         $this->name = $name;
     }
-    
+    /**
+     * 
+     * @param int $type
+     * @return Player
+     */
     public function createPlayer($type) {
         $builder = $this->getBuilder($type);
         $builder->setName($this->name);
