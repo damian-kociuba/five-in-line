@@ -9,9 +9,7 @@ use AppBundle\Game\Player;
  *
  * @author dkociuba
  */
-class HumanPlayerBuilder implements PlayerBuilderInterface {
-
-    private $name;
+class HumanPlayerBuilder extends PlayerBuilder {
 
     /**
      * @return Player
@@ -20,10 +18,6 @@ class HumanPlayerBuilder implements PlayerBuilderInterface {
         $player = new Player();
         $player->setName($this->name);
         return $player;
-    }
-
-    public function setName($name) {
-        $this->name = $name;
     }
 
 }

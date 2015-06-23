@@ -3,7 +3,7 @@
 namespace AppBundle\Game;
 
 use AppBundle\Game\GamesRepository;
-use AppBundle\Game\GameBuilder;
+use AppBundle\Game\GameBuilderSupervisor;
 
 /**
  * Description of PublicGamesManager

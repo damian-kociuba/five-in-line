@@ -3,23 +3,13 @@
 namespace AppBundle\Game\GameBuilder;
 
 use AppBundle\Game\AI\AIGame;
-use AppBundle\ConfigContainer;
 
 /**
  * Description of PublicGameBuilder
  *
  * @author dkociuba
  */
-class AIGameBuilder implements GameBuilderInterface {
-
-    /**
-     * @var ConfigContainer
-     */
-    private $config;
-
-    public function setConfig(ConfigContainer $config) {
-        $this->config = $config;
-    }
+class AIGameBuilder extends GameBuilder {
 
     /**
      * @return PublicGame

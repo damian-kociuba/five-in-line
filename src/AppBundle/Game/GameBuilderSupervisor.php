@@ -5,7 +5,7 @@ namespace AppBundle\Game;
 use AppBundle\Game\GameBuilder\PrivateGameBuilder;
 use AppBundle\Game\GameBuilder\PublicGameBuilder;
 use AppBundle\Game\GameBuilder\AIGameBuilder;
-use AppBundle\Game\GameBuilder\GameBuilderInterface;
+use AppBundle\Game\GameBuilder\GameBuilder;
 use AppBundle\Game\Player;
 use AppBundle\ConfigContainer;
 use AppBundle\Game\Game;
@@ -15,11 +15,7 @@ use AppBundle\Game\Game;
  *
  * @author dkociuba
  */
-class GameBuilder {
-
-    const PRIVATE_GAME = 1;
-    const PUBLIC_GAME = 2;
-    const AI_GAME = 3;
+class GameBuilderSupervisor {
 
     /**
      *
@@ -43,32 +39,16 @@ class GameBuilder {
 
     /**
      * 
-     * @param type $type
-     * @return Game
+     * @param GameBuilder $builder
+     * @return type
      */
-    public function createGame($type) {
-        $builder = $this->getBuilder($type);
+    public function createGame(GameBuilder $builder) {
 
         $builder->setConfig($this->config);
         $game = $builder->build();
 
         $game->addPlayer($this->creator);
         return $game;
-    }
-
-    /**
-     * 
-     * @param int $type
-     * @return GameBuilderInterface
-     * @throws \Exception
-     */
-    private function getBuilder($type) {
-        switch ($type) {
-            case self::PRIVATE_GAME : return new PrivateGameBuilder();
-            case self::PUBLIC_GAME : return new PublicGameBuilder();
-            case self::AI_GAME : return new AIGameBuilder();
-            default: throw new \Exception('Unknow game type');
-        }
     }
 
 }

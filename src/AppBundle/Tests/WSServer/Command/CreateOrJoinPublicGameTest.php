@@ -4,7 +4,8 @@ namespace AppBundle\WSServer\Command;
 
 use AppBundle\ConfigContainer;
 use AppBundle\Game\GamesRepository;
-use AppBundle\Game\GameBuilder;
+use AppBundle\Game\GameBuilderSupervisor;
+use AppBundle\Game\GameBuilder\PublicGameBuilder;
 use AppBundle\Game\PublicGame;
 use AppBundle\Game\Player;
 
@@ -42,7 +43,7 @@ class CreateOrJoinPublicGameTest extends \PHPUnit_Framework_TestCase {
             'boardHeight' => 20
         ));
         
-        $gameBuilder = new GameBuilder($config);
+        $gameBuilder = new GameBuilderSupervisor($config);
         return $gameBuilder;
     }
 
@@ -132,7 +133,7 @@ class CreateOrJoinPublicGameTest extends \PHPUnit_Framework_TestCase {
         $gameBuilder = $this->prepareGameBuilder();
         $gameBuilder->setCreator($this->gameCreator);
 
-        $joinableGame = $gameBuilder->createGame(GameBuilder::PUBLIC_GAME);
+        $joinableGame = $gameBuilder->createGame(new PublicGameBuilder());
         return $joinableGame;
     }
 

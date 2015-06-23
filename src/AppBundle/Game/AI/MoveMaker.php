@@ -55,31 +55,27 @@ class MoveMaker {
     }
 
     public function getNextMoveCoordinate() {
-        $timer = new Timer();
-        $timer->start();
-
         $this->gameTreeRoot->setValue($this->board);
         $boardValue = $this->boardValueCalculator->calculateValue($this->board, $this->movingPlayer->getColor(), $this->opponent->getColor());
         $this->gameTreeRoot->getValue()->setValue($boardValue);
-        echo 'drzewa liście: ' . count($this->gameTreeRoot->getLeaves()) . "\n";
-        $this->prepareNextLevelOfGameTree($this->gameTreeRoot, $this->movingPlayer, $this->opponent);
-        echo 'drzewa liście: ' . count($this->gameTreeRoot->getLeaves()) . "\n";
-        $this->prepareNextLevelOfGameTree($this->gameTreeRoot, $this->opponent, $this->movingPlayer);
-        echo 'drzewa liście: ' . count($this->gameTreeRoot->getLeaves()) . "\n";
 
-        $this->deleteAllNotBestLeaves($this->gameTreeRoot);
-        echo 'drzewa liście: ' . count($this->gameTreeRoot->getLeaves()) . "\n";
-//        $this->deleteTheWorstLeaves($this->gameTreeRoot);
-//        echo 'drzewa liście: ' . count($this->gameTreeRoot->getLeaves()) . "\n";
+        //two moves forward
+        $this->prepareNextLevelOfGameTree($this->gameTreeRoot, $this->movingPlayer, $this->opponent);
+        $this->prepareNextLevelOfGameTree($this->gameTreeRoot, $this->opponent, $this->movingPlayer);
+
+        //human opponent should choose the best move for him
+        $this->leaveOnlyBestLeaves($this->gameTreeRoot);
 
 
         $leaves = $this->gameTreeRoot->getLeaves();
-        echo 'pobrano liscie: ' . count($leaves);
+
+        //calculate value for each path from root to leaf
         foreach ($leaves as $i => $leaf) {
             $value = $this->calculateBranchValue($leaf);
             $values[$i] = $value;
         }
-        //var_dump($values);
+
+        //find path with maximum value
         $max = $values[0];
         $maxI = 0;
         foreach ($values as $i => $value) {
@@ -88,20 +84,16 @@ class MoveMaker {
                 $maxI = $i;
             }
         }
-        echo "Max $max \n";
+
+        //the best leaf
         $node = $leaves[$maxI];
+
         echo $node->getValue()->getAsString();
         while ($node->getParent() !== $this->gameTreeRoot) {
             $node = $node->getParent();
         }
 
-        $timer->stop();
-        echo 'getNextMove: ' . $timer->getResult() . "\n";
-        echo 'sum of calculations: ' . BoardValueCalculator::$timer->getResult() . " / " . BoardValueCalculator::$calcCounter . "\n  ";
-        BoardValueCalculator::$timer->reset();
-        BoardValueCalculator::$calcCounter = 0;
         return $node->getValueOfEdgeToParent();
-        //return $theBestMove;
     }
 
     private function prepareNextLevelOfGameTree(TreeNode $node, Player $movingPlayer, Player $opponent) {
@@ -127,15 +119,8 @@ class MoveMaker {
                 if ($board->getByXY($x, $y) !== null) { //non empty fields are ommited
                     continue;
                 }
-                $needsToCheck = false;
-                for ($sx = max(0, $x - 1); $sx < min($this->board->getWidth(), $x + 2); $sx++) {
-                    for ($sy = max(0, $y - 1); $sy < min($this->board->getHeight(), $y + 2); $sy++) {
-                        if ($board->getByXY($sx, $sy) !== null) {
-                            $needsToCheck = true;
-                        }
-                    }
-                }
-                if (!$needsToCheck) {
+                
+                if (!$this->isFieldNeedsToBeChecked($board, $x, $y)) {
                     continue;
                 }
 
@@ -160,21 +145,15 @@ class MoveMaker {
         }
     }
 
-    /**
-     * @deprecated 
-     * @param TreeNode $node
-     */
-    private function deleteTheWorstLeaves(TreeNode $node) {
-        $leaves = $node->getLeaves();
-        $fun = function (TreeNode $a, TreeNode $b) {
-            return $a->getValue()->getValue() - $b->getValue()->getValue();
-        };
-        usort($leaves, $fun);
-
-        $leavesToDelete = array_slice($leaves, 0, max((int) (count($leaves) * 0.90), count($leaves) - 10));
-        foreach ($leavesToDelete as $leaf) {
-            $this->deleteLeaf($leaf);
+    private function isFieldNeedsToBeChecked(Board $board, $x, $y) {
+        for ($sx = max(0, $x - 1); $sx < min($board->getWidth(), $x + 2); $sx++) {
+            for ($sy = max(0, $y - 1); $sy < min($board->getHeight(), $y + 2); $sy++) {
+                if ($board->getByXY($sx, $sy) !== null) {
+                    return true;
+                }
+            }
         }
+        return false;
     }
 
     private function deleteLeaf(TreeNode $node) {
@@ -192,7 +171,7 @@ class MoveMaker {
         }
     }
 
-    private function deleteAllNotBestLeaves(TreeNode $node) {
+    private function leaveOnlyBestLeaves(TreeNode $node) {
         if ($node->isLeaf()) {
             return;
         }
@@ -202,7 +181,7 @@ class MoveMaker {
             if ($child->isLeaf()) {
                 $leavesOfBranch[] = $child;
             } else {
-                $this->deleteAllNotBestLeaves($child);
+                $this->leaveOnlyBestLeaves($child);
             }
         }
         if (empty($leavesOfBranch)) {
@@ -244,7 +223,7 @@ class MoveMaker {
                 //echo ' - ' . ($value);
             }
         }
-       // echo ' = ' . $sum . "\n";
+        // echo ' = ' . $sum . "\n";
         return $sum;
     }
 

@@ -3,8 +3,10 @@
 namespace AppBundle\WSServer\Command;
 
 use AppBundle\Game\GamesRepository;
-use AppBundle\Game\GameBuilder;
-use AppBundle\Game\PlayerBuilder;
+use AppBundle\Game\GameBuilderSupervisor;
+use AppBundle\Game\GameBuilder\PrivateGameBuilder;
+use AppBundle\Game\PlayerBuilderSupervisor;
+use AppBundle\Game\PlayerBuilder\HumanPlayerBuilder;
 use AppBundle\WSServer\Response\PrivateGameCreated;
 use AppBundle\WSServer\Message;
 
@@ -18,11 +20,11 @@ class CreatePrivateGame implements WSCommandInterface {
      */
     private $gamesRepository;
     /**
-     * @var GameBuilder
+     * @var GameBuilderSupervisor
      */
     private $gameBuilder;
 
-    public function __construct(GamesRepository $gamesRepository, GameBuilder $gameBuilder) {
+    public function __construct(GamesRepository $gamesRepository, GameBuilderSupervisor $gameBuilder) {
         $this->gamesRepository = $gamesRepository;
         $this->gameBuilder = $gameBuilder;
     }
@@ -30,14 +32,14 @@ class CreatePrivateGame implements WSCommandInterface {
     public function run(Message $message) {
         $parameters = $message->getParameters();
         echo 'Create Private Game';
-         $playerBuilder = new PlayerBuilder();
+         $playerBuilder = new PlayerBuilderSupervisor();
         
         $playerBuilder->setPlayerName($parameters['playerName']);
-        $player = $playerBuilder->createPlayer(PlayerBuilder::HUMAN_PLAYER);
+        $player = $playerBuilder->createPlayer(new HumanPlayerBuilder());
         $player->setConnection($message->getConnection());
         
         $this->gameBuilder->setCreator($player);
-        $game = $this->gameBuilder->createGame(GameBuilder::PRIVATE_GAME);
+        $game = $this->gameBuilder->createGame(new PrivateGameBuilder());
         
         $this->gamesRepository->attach($game);
 

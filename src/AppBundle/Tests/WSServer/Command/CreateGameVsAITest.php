@@ -34,7 +34,7 @@ class CreateGameVsAITest extends \PHPUnit_Framework_TestCase {
             'boardWidth' => 20,
             'boardHeight' => 20
         ));
-        $gameBuilder = new \AppBundle\Game\GameBuilder($config);
+        $gameBuilder = new \AppBundle\Game\GameBuilderSupervisor($config);
         $this->gamesRepository = new GamesRepository();
         $this->object = new CreateGameVsAI($this->gamesRepository, $gameBuilder);
         $this->connection = new ConnectionMock();

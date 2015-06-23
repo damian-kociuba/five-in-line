@@ -14,12 +14,16 @@ use AppBundle\Game\Player;
  *
  * @author dkociuba
  */
-interface PlayerBuilderInterface {
+abstract class PlayerBuilder {
 
-    public function setName($name);
+    protected $name;
+    
+    public function setName($name) {
+        $this->name = $name;
+    }
 
     /**
      * @return Player
      */
-    public function build();
+    public abstract function build();
 }

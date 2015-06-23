@@ -3,8 +3,10 @@
 namespace AppBundle\WSServer\Command;
 
 use AppBundle\Game\GamesRepository;
-use AppBundle\Game\GameBuilder;
-use AppBundle\Game\PlayerBuilder;
+use AppBundle\Game\GameBuilderSupervisor;
+use AppBundle\Game\GameBuilder\AIGameBuilder;
+use AppBundle\Game\PlayerBuilderSupervisor;
+use AppBundle\Game\PlayerBuilder\AIPlayerBuilder;
 use AppBundle\WSServer\Response\StartGame;
 use AppBundle\WSServer\Message;
 
@@ -19,32 +21,32 @@ class CreateGameVsAI implements WSCommandInterface {
     private $gamesRepository;
 
     /**
-     * @var GameBuilder
+     * @var GameBuilderSupervisor
      */
     private $gameBuilder;
 
-    public function __construct(GamesRepository $gamesRepository, GameBuilder $gameBuilder) {
+    public function __construct(GamesRepository $gamesRepository, GameBuilderSupervisor $gameBuilder) {
         $this->gamesRepository = $gamesRepository;
         $this->gameBuilder = $gameBuilder;
     }
 
     public function run(Message $message) {
         echo 'Create Game vs AI';
-        $playerBuilder = new PlayerBuilder();
+        $playerBuilder = new PlayerBuilderSupervisor();
         
         $playerBuilder->setPlayerName('Player');
-        $player = $playerBuilder->createPlayer(PlayerBuilder::AI_PLAYER);
+        $player = $playerBuilder->createPlayer(new AIPlayerBuilder());
         
         $player->setConnection($message->getConnection());
         $player->setColor('white');
         
         $playerBuilder->setPlayerName('Computer');
-        $opponent = $playerBuilder->createPlayer(PlayerBuilder::AI_PLAYER);
+        $opponent = $playerBuilder->createPlayer(new AIPlayerBuilder());
         $opponent->setColor('black');
         $opponent->setOpponent($player);
 
         $this->gameBuilder->setCreator($player);
-        $game = $this->gameBuilder->createGame(GameBuilder::AI_GAME);
+        $game = $this->gameBuilder->createGame(new AIGameBuilder());
         
         $opponent->setBoard($game->getBoard());
         $game->addPlayer($opponent);

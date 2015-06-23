@@ -9,9 +9,7 @@ use AppBundle\Game\AI\AIPlayer;
  *
  * @author dkociuba
  */
-class AIPlayerBuilder implements PlayerBuilderInterface {
-
-    private $name;
+class AIPlayerBuilder extends PlayerBuilder {
 
     /**
      * @return AIPlayer
@@ -22,9 +20,4 @@ class AIPlayerBuilder implements PlayerBuilderInterface {
         $player->setConnection(new \AppBundle\WSServer\ArtificialConnection());
         return $player;
     }
-
-    public function setName($name) {
-        $this->name = $name;
-    }
-
 }

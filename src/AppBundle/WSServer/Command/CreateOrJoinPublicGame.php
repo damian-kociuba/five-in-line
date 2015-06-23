@@ -5,12 +5,14 @@ namespace AppBundle\WSServer\Command;
 use AppBundle\Game\GamesRepository;
 use AppBundle\WSServer\Response\PrivateGameCreated;
 use AppBundle\WSServer\Message;
-use AppBundle\Game\PlayerBuilder;
+use AppBundle\Game\PlayerBuilderSupervisor;
+use AppBundle\Game\PlayerBuilder\HumanPlayerBuilder;
 use AppBundle\Game\PublicGamesManager;
 use AppBundle\Game\PublicGame;
 use AppBundle\Game\Player;
 use AppBundle\Game\GameInitializer;
-use AppBundle\Game\GameBuilder;
+use AppBundle\Game\GameBuilderSupervisor;
+use AppBundle\Game\GameBuilder\PublicGameBuilder;
 
 /**
  * @author dkociuba
@@ -23,11 +25,11 @@ class CreateOrJoinPublicGame implements WSCommandInterface {
      */
     private $gamesRepository;
     /**
-     * @var GameBuilder
+     * @var GameBuilderSupervisor
      */
     private $gameBuilder;
 
-    public function __construct(GamesRepository $gamesRepository, GameBuilder $gameBuilder) {
+    public function __construct(GamesRepository $gamesRepository, GameBuilderSupervisor $gameBuilder) {
         $this->gamesRepository = $gamesRepository;
         $this->gameBuilder = $gameBuilder;
     }
@@ -78,9 +80,9 @@ class CreateOrJoinPublicGame implements WSCommandInterface {
      */
     private function prepareNewPlayer(Message $message) {
         $parameters = $message->getParameters();
-        $playerBuilder = new PlayerBuilder();
+        $playerBuilder = new PlayerBuilderSupervisor();
         $playerBuilder->setPlayerName($parameters['playerName']);
-        $player = $playerBuilder->createPlayer(PlayerBuilder::HUMAN_PLAYER);
+        $player = $playerBuilder->createPlayer(new HumanPlayerBuilder());
 
         $player->setConnection($message->getConnection());
         return $player;
@@ -89,7 +91,7 @@ class CreateOrJoinPublicGame implements WSCommandInterface {
     private function addNewPublicGame(Message $message) {
         $creator = $this->prepareNewPlayer($message);
         $this->gameBuilder->setCreator($creator);
-        $game = $this->gameBuilder->createGame(GameBuilder::PUBLIC_GAME);
+        $game = $this->gameBuilder->createGame(new PublicGameBuilder());
         $this->gamesRepository->attach($game);
     }
 

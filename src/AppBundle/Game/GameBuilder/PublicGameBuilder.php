@@ -3,22 +3,11 @@
 namespace AppBundle\Game\GameBuilder;
 
 use AppBundle\Game\PublicGame;
-use AppBundle\ConfigContainer;
+
 /**
- * Description of PublicGameBuilder
- *
  * @author dkociuba
  */
-class PublicGameBuilder implements GameBuilderInterface {
-
-    /**
-     * @var ConfigContainer
-     */
-    private $config;
-
-    public function setConfig(ConfigContainer $config) {
-        $this->config = $config;
-    }
+class PublicGameBuilder extends GameBuilder {
 
     /**
      * @return PublicGame

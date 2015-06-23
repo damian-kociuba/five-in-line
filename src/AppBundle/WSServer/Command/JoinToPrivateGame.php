@@ -5,7 +5,8 @@ namespace AppBundle\WSServer\Command;
 use AppBundle\Game\GamesRepository;
 use AppBundle\WSServer\Message;
 use AppBundle\WSServer\Response\StartGame;
-use AppBundle\Game\PlayerBuilder;
+use AppBundle\Game\PlayerBuilderSupervisor;
+use AppBundle\Game\PlayerBuilder\HumanPlayerBuilder;
 
 /**
  * @author dkociuba
@@ -43,12 +44,12 @@ class JoinToPrivateGame implements WSCommandInterface {
 
         $game = $this->gamesRepository->findFirstBy(array('hashId' => $gameHash));
         $firstPlayer = $this->getFirstPlayer($game);
-        
-        $playerBuilder = new PlayerBuilder();
-        
+
+        $playerBuilder = new PlayerBuilderSupervisor();
+
         $playerBuilder->setPlayerName($playerName);
-        $secondPlayer = $playerBuilder->createPlayer(PlayerBuilder::HUMAN_PLAYER);
-        
+        $secondPlayer = $playerBuilder->createPlayer(new HumanPlayerBuilder());
+
         $secondPlayer->setConnection($message->getConnection());
         $game->addPlayer($secondPlayer);
 
