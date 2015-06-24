@@ -13,7 +13,7 @@ services:
         class: AppBundle\Game\GamesRepository
         
     game_builder:
-        class: AppBundle\Game\GameBuilder
+        class: AppBundle\Game\GameBuilderSupervisor
         arguments:
             - @config_container
             
